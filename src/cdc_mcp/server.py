@@ -181,6 +181,8 @@ async def call_tool(request: CallToolRequest) -> list[TextContent]:
                     "brfss_obesity_state": "BRFSS: State-level obesity prevalence",
                     "brfss_diabetes": "BRFSS: Diabetes prevalence data",
                     "brfss_asthma": "BRFSS: Asthma prevalence data",
+                    "brfss_asthma_prevalence": "BRFSS: Current asthma prevalence (2011+)",
+                    "brfss_tobacco_use": "BRFSS: Tobacco use prevalence trends (1995-2010)",
                     # Note: Some BRFSS datasets require authentication
                     # "brfss_chronic_health_indicators": "BRFSS: Chronic health indicators (requires auth)",
                     # "brfss_demographics": "BRFSS: Demographic breakdowns (requires auth)",
@@ -194,7 +196,11 @@ async def call_tool(request: CallToolRequest) -> list[TextContent]:
                     "covid_cases": "COVID-19 Case Surveillance (if available)",
                     "cancer_incidence": "Cancer incidence statistics",
                     "vsrr_quarterly_mortality": "VSRR: Quarterly provisional mortality estimates",
-                    "vsrr_maternal_mortality": "VSRR: Provisional maternal death counts"
+                    "vsrr_maternal_mortality": "VSRR: Provisional maternal death counts",
+                    "vsrr_infant_mortality": "VSRR: Quarterly provisional infant mortality estimates",
+                    "nchs_death_rates_life_expectancy": "NCHS: Death rates and life expectancy at birth (since 1900)",
+                    # "nats_adult_tobacco": "NATS: National Adult Tobacco Survey (requires auth)",
+                    "adult_tobacco_consumption": "Adult tobacco consumption in the U.S. (2000+)"
                 },
                 "total_datasets": len(cdc_client.DATASETS)
             }

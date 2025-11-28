@@ -35,6 +35,8 @@ class CDCAPIClient:
         "brfss_obesity_state": "xtew-z72g",
         "brfss_diabetes": "7yww-23y7",
         "brfss_asthma": "kj5r-3dtm",
+        "brfss_asthma_prevalence": "xb47-c5mz",  # Current asthma prevalence graph (2011+)
+        "brfss_tobacco_use": "8zak-ewtm",  # Tobacco use prevalence trends (1995-2010)
         # Note: Some BRFSS datasets require authentication
         # "brfss_chronic_health_indicators": "u7k3-tu8b",  # Requires auth
         # "brfss_demographics": "6rsf-i7tq",  # Requires auth
@@ -63,6 +65,14 @@ class CDCAPIClient:
         # VSRR: Vital Statistics Rapid Release (Provisional Mortality)
         "vsrr_quarterly_mortality": "489q-934x",  # Quarterly provisional mortality estimates
         "vsrr_maternal_mortality": "e2d5-ggg7",  # Provisional maternal death counts
+        "vsrr_infant_mortality": "jqwm-z2g9",  # Quarterly provisional infant mortality estimates
+
+        # NCHS: National Center for Health Statistics
+        "nchs_death_rates_life_expectancy": "w9j2-ggv5",  # Death rates and life expectancy at birth
+
+        # Tobacco/Smoking Surveillance
+        # "nats_adult_tobacco": "tbfm-vbpp",  # National Adult Tobacco Survey (requires auth)
+        "adult_tobacco_consumption": "rnvb-cpxx",  # Adult tobacco consumption (2000+)
     }
 
     def __init__(self, app_token: Optional[str] = None):
