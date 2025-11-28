@@ -35,12 +35,18 @@ class CDCAPIClient:
         "brfss_obesity_state": "xtew-z72g",
         "brfss_diabetes": "7yww-23y7",
         "brfss_asthma": "kj5r-3dtm",
+        # Note: Some BRFSS datasets require authentication
+        # "brfss_chronic_health_indicators": "u7k3-tu8b",  # Requires auth
+        # "brfss_demographics": "6rsf-i7tq",  # Requires auth
+        # "brfss_cvd_surveillance": "ikwk-8git",  # Requires auth
 
         # Chronic Disease Indicators (Note: May require authentication)
         # "chronic_disease_indicators": "g4ie-h725",
 
         # Nutrition, Physical Activity, Obesity
         "nutrition_obesity": "hn4x-zwk7",
+        "nutrition_policy_environmental": "k8w5-7ju6",  # Policy/environmental supports
+        "nutrition_commute_patterns": "8mrp-rmkw",  # ACS commuting data
 
         # Heart Disease Mortality
         "heart_disease_mortality": "6x7h-usvx",
@@ -53,6 +59,10 @@ class CDCAPIClient:
 
         # Cancer Statistics
         "cancer_incidence": "c7dz-iz9w",
+
+        # VSRR: Vital Statistics Rapid Release (Provisional Mortality)
+        "vsrr_quarterly_mortality": "489q-934x",  # Quarterly provisional mortality estimates
+        "vsrr_maternal_mortality": "e2d5-ggg7",  # Provisional maternal death counts
     }
 
     def __init__(self, app_token: Optional[str] = None):

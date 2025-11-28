@@ -13,25 +13,45 @@ An MCP (Model Context Protocol) server providing access to CDC (Centers for Dise
 
 ## Available Data Sources
 
-### PLACES: Local Data for Better Health
+**Total Public Datasets: 18** (+ 6 require authentication)
+
+### PLACES: Local Data for Better Health (5 datasets)
 - County-level data (2023, 2024)
 - Place/city-level data (2024)
 - Census tract-level data (2024)
 - ZIP Code Tabulation Area (ZCTA) data (2024)
-- 36 health measures including diabetes, obesity, heart disease, COPD, asthma, etc.
+- 36+ health measures including diabetes, obesity, heart disease, COPD, asthma, etc.
 
-### BRFSS: Behavioral Risk Factor Surveillance System
+### BRFSS: Behavioral Risk Factor Surveillance System (4 datasets)
 - National obesity trends
 - State-level obesity prevalence
 - Diabetes prevalence
 - Asthma prevalence
+- **Note:** Additional BRFSS datasets (demographics, CVD, chronic health indicators) require authentication
 
-### Other CDC Datasets
-- U.S. Chronic Disease Indicators
-- Nutrition, Physical Activity, and Obesity data
+### VSRR: Vital Statistics Rapid Release (2 datasets)
+- Quarterly provisional mortality estimates (15 leading causes + drug overdose, firearms, etc.)
+- Provisional maternal death counts and rates
+
+### Nutrition, Physical Activity & Obesity (3 datasets)
+- Behavioral risk factors
+- Policy and environmental supports
+- Commuting patterns (American Community Survey)
+
+### Other CDC Datasets (4 datasets)
 - Heart Disease Mortality statistics
 - Diabetes Surveillance System
+- COVID-19 Case Surveillance (if available)
 - Cancer incidence data
+
+### Datasets Requiring Authentication
+Some datasets require a Socrata app token:
+- Chronic Disease Indicators
+- BRFSS Demographics
+- BRFSS CVD Surveillance
+- BRFSS Chronic Health Indicators
+
+**To access these:** Register at https://data.cdc.gov/profile/app_tokens
 
 ## Installation
 

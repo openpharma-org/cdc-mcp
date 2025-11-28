@@ -181,12 +181,20 @@ async def call_tool(request: CallToolRequest) -> list[TextContent]:
                     "brfss_obesity_state": "BRFSS: State-level obesity prevalence",
                     "brfss_diabetes": "BRFSS: Diabetes prevalence data",
                     "brfss_asthma": "BRFSS: Asthma prevalence data",
+                    # Note: Some BRFSS datasets require authentication
+                    # "brfss_chronic_health_indicators": "BRFSS: Chronic health indicators (requires auth)",
+                    # "brfss_demographics": "BRFSS: Demographic breakdowns (requires auth)",
+                    # "brfss_cvd_surveillance": "BRFSS: CVD surveillance (requires auth)",
                     # "chronic_disease_indicators": "U.S. Chronic Disease Indicators (requires auth)",
-                    "nutrition_obesity": "Nutrition, Physical Activity, and Obesity data",
+                    "nutrition_obesity": "Nutrition, Physical Activity, and Obesity - Behavioral",
+                    "nutrition_policy_environmental": "Nutrition, Physical Activity - Policy/Environmental",
+                    "nutrition_commute_patterns": "Nutrition, Physical Activity - Commuting Patterns",
                     "heart_disease_mortality": "Heart Disease Mortality by State",
                     "diabetes_indicators": "Diabetes Surveillance System indicators",
                     "covid_cases": "COVID-19 Case Surveillance (if available)",
-                    "cancer_incidence": "Cancer incidence statistics"
+                    "cancer_incidence": "Cancer incidence statistics",
+                    "vsrr_quarterly_mortality": "VSRR: Quarterly provisional mortality estimates",
+                    "vsrr_maternal_mortality": "VSRR: Provisional maternal death counts"
                 },
                 "total_datasets": len(cdc_client.DATASETS)
             }
