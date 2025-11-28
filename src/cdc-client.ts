@@ -24,19 +24,29 @@ import {
 export class CDCClient {
   private rateLimiter: RateLimiter;
   private axiosInstance: AxiosInstance;
+  private appToken?: string;
 
-  constructor() {
+  constructor(appToken?: string) {
+    this.appToken = appToken;
     this.rateLimiter = {
       lastRequestTime: 0,
       delay: REQUEST_DELAY_MS,
     };
 
     // Create axios instance with retry logic
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    // Add X-App-Token header if provided (Socrata standard authentication)
+    if (appToken) {
+      headers['X-App-Token'] = appToken;
+      console.log('CDC Client: Using app token for enhanced rate limits');
+    }
+
     this.axiosInstance = axios.create({
       timeout: 30000,
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
     });
 
     // Configure automatic retries

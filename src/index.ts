@@ -15,8 +15,15 @@ import {
 import { CDCClient } from './cdc-client.js';
 import { CDCToolRequest } from './types.js';
 
-// Initialize CDC client
-const cdcClient = new CDCClient();
+// Initialize CDC client with optional app token from environment
+const appToken = process.env.CDC_APP_TOKEN;
+if (appToken) {
+  console.error('CDC MCP Server: Using app token for enhanced rate limits (1000 req/hour)');
+} else {
+  console.error('CDC MCP Server: No app token - using shared rate limit pool');
+}
+
+const cdcClient = new CDCClient(appToken);
 
 // MCP Server
 const server = new Server(
