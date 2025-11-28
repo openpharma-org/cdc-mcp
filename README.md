@@ -1,19 +1,21 @@
 # CDC MCP Server
 
-An MCP (Model Context Protocol) server providing access to CDC (Centers for Disease Control and Prevention) public health data through the Socrata Open Data API (SODA).
+A Node.js MCP (Model Context Protocol) server providing access to CDC (Centers for Disease Control and Prevention) public health data through the Socrata Open Data API (SODA).
 
 ## Features
 
-- **PLACES Data**: Local disease prevalence at county, place, census tract, and ZIP code levels
+- **TypeScript Implementation**: Built with @modelcontextprotocol/sdk
+- **PLACES Data**: Local disease prevalence at county, place, census tract, and ZIP code levels (40+ health measures)
 - **BRFSS Data**: Behavioral Risk Factor Surveillance System for chronic disease risk factors
-- **Chronic Disease Indicators**: Comprehensive chronic disease surveillance data
+- **Vital Statistics**: Provisional mortality data (VSRR) with quarterly updates
 - **Unified Interface**: Single tool with method parameter for all CDC data operations
-- **Rate Limiting**: Built-in rate limiting to respect API quotas
+- **Rate Limiting**: Built-in rate limiting (500ms delay) to respect API quotas
+- **App Token Support**: Enhanced rate limits (1,000 requests/hour) with valid app token
 - **Flexible Querying**: Support for filtering, pagination, and custom SoQL queries
 
 ## Available Data Sources
 
-**Total Public Datasets: 18** (+ 6 require authentication)
+**Total Public Datasets: 23** (no authentication required)
 
 ### PLACES: Local Data for Better Health (5 datasets)
 - County-level data (2023, 2024)
@@ -57,81 +59,50 @@ Some datasets require a Socrata app token:
 
 ```bash
 cd cdc-mcp-server
-pip install -e .
+npm install
+npm run build
 ```
 
 ## Configuration
 
 ### Optional: Socrata App Token
 
-For higher rate limits (1,000 requests/hour vs shared pool):
+For enhanced rate limits (1,000 requests/hour vs shared pool):
 
 1. Register at https://data.cdc.gov/profile/app_tokens
-2. Set environment variable:
+2. Add to your MCP client configuration (see below)
 
-```bash
-export CDC_APP_TOKEN="your_app_token_here"
-```
+**Current Status**: Server configured with valid app token for enhanced rate limits ✅
 
 ## Usage
 
 ### As MCP Server
 
-Add to your MCP client configuration:
+Add to your MCP client configuration (`.mcp.json`):
 
 ```json
 {
   "mcpServers": {
-    "cdc": {
-      "command": "python",
-      "args": ["-m", "cdc_mcp.server"],
+    "cdc-mcp-server": {
+      "command": "node",
+      "args": ["/path/to/cdc-mcp-server/build/index.js"],
       "env": {
-        "CDC_APP_TOKEN": "your_token_here"
+        "CDC_APP_TOKEN": "your_app_token_here"
       }
     }
   }
 }
 ```
 
-### Direct Usage Examples
+**Note**: The `CDC_APP_TOKEN` environment variable is optional but recommended for enhanced rate limits.
 
-```python
-from cdc_mcp.cdc_client import CDCAPIClient
+### Quick Start
 
-# Initialize client
-client = CDCAPIClient(app_token="your_token")  # app_token is optional
-
-# Get diabetes prevalence in California counties
-result = client.get_places_data(
-    geography_level="county",
-    year="2024",
-    state="CA",
-    measure_id="DIABETES",
-    limit=100
-)
-
-# Get national obesity trends
-result = client.get_brfss_data(
-    dataset_type="obesity_national",
-    year=2023
-)
-
-# Get chronic disease indicators for heart disease
-result = client.get_chronic_disease_indicators(
-    topic="Cardiovascular Disease",
-    year_start=2020,
-    year_end=2024,
-    location="US"
-)
-
-# Generic search with custom SoQL query
-result = client.search_dataset(
-    dataset_name="places_county_2024",
-    select_fields=["locationname", "measureid", "data_value"],
-    where_clause="stateabbr='TX' AND data_value>15.0",
-    limit=50
-)
-```
+1. Install dependencies: `npm install`
+2. Build TypeScript: `npm run build`
+3. Add to your MCP client configuration
+4. Restart your MCP client (e.g., Claude Code)
+5. Query using the `cdc_health_data` tool
 
 ## MCP Tool Usage
 
