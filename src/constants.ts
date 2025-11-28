@@ -1,9 +1,9 @@
 /**
  * CDC Dataset Identifiers for Socrata Open Data API (SODA)
  *
- * Total: 53 public datasets (no authentication required) - TIER 1 + TIER 2 + TIER 3 EXPANSION
- * Coverage: 80+ health measures across multiple surveillance systems
- * Last Updated: 2025-11-28
+ * Total: 73 public datasets (no authentication required) - TIER 1-3 + PHASE 4 EXPANSION
+ * Coverage: 80+ health measures + real-time outbreak detection
+ * Last Updated: 2025-11-28 (Phase 4: Critical Surveillance)
  */
 
 export const CDC_BASE_URL = 'https://data.cdc.gov/resource';
@@ -130,6 +130,44 @@ export const DATASETS = {
 
   // Historical BRFSS (1 dataset)
   brfss_healthcare_access_historical: 't984-9cdv', // BRFSS Health Care Access/Coverage 1995-2010
+
+  // === PHASE 4: CRITICAL SURVEILLANCE GAPS (20 datasets) ===
+  // Added 2025-11-28 - Real-time outbreak detection, vaccination tracking, overdose monitoring
+
+  // NNDSS: National Notifiable Diseases Surveillance System (14 datasets)
+  // Real-time disease outbreak detection (weekly provisional)
+  nndss_arboviral: '4ewf-ciy6', // Arboviral diseases (West Nile, St. Louis encephalitis, Eastern/Western equine)
+  nndss_hepatitis: 'xna8-x7qg', // Hepatitis A, B, C (acute + perinatal infection, influenza-associated pediatric mortality)
+  nndss_tuberculosis: 'tfu6-pjxh', // Tuberculosis surveillance (weekly provisional 2020-2022)
+  nndss_rubella: '2khz-k7sv', // Rubella & congenital rubella syndrome
+  nndss_pertussis: '247v-f7n9', // Pertussis & poliomyelitis (whooping cough surveillance)
+  nndss_haemophilus: 'cvcu-witw', // Haemophilus influenzae invasive disease (age <5 years, serotypes)
+  nndss_qfever: 'tdge-ieq8', // Q fever (acute & chronic surveillance)
+  nndss_botulism: 'qwf3-87ny', // Botulism (foodborne, infant, wound)
+
+  // NNDSS Historical - Tuberculosis Trends (6 datasets)
+  nndss_tb_2019: '5avu-ff58', // Tuberculosis surveillance 2019
+  nndss_tb_2018: 'u3yt-gdfa', // Tuberculosis surveillance 2018
+  nndss_tb_2017: '9g7x-sfq4', // Tuberculosis surveillance 2017
+  nndss_tb_2016: 'pkas-xr96', // Tuberculosis surveillance 2016
+  nndss_tb_2015: 'ei7y-3g6s', // Tuberculosis surveillance 2015
+  nndss_tb_2014: 'pxa6-asqb', // Tuberculosis surveillance 2014
+
+  // COVID-19 Vaccination Tracking (4 datasets)
+  // County-level tracking with equity metrics (SVI, urban/rural)
+  covid_vax_jurisdiction: 'unsk-b7fc', // National/state/territory vaccination (weekly updates)
+  covid_vax_county: '8xkx-amqh', // County-level + equity data (SVI, metro/non-metro, completeness)
+  covid_vax_respiratory_weekly: '5c6r-xi2t', // Weekly respiratory virus vaccination (flu, COVID, RSV) - all ages
+  covid_vax_age_trends: 'gxj9-t96f', // Vaccination & case trends by age group (archived - Oct 2022)
+
+  // Drug Overdose Crisis Monitoring (6 datasets)
+  // Real-time overdose surveillance with drug-specific tracking
+  overdose_provisional_state: 'xkb8-kh2a', // VSRR Provisional drug overdose deaths (monthly state-level)
+  overdose_county: 'gb4e-yj24', // County-level overdose deaths (12-month ending provisional)
+  overdose_by_drug: '8hzs-zshh', // Deaths by specific drugs (opioids, fentanyl, heroin, cocaine, meth)
+  overdose_demographics: '95ax-ymtc', // Overdose deaths by demographics (age, sex, race, drug type)
+  overdose_nowcast: 'v2g4-wqg2', // Early model-based estimates (nowcasting with reporting lag adjustment)
+  nchs_injury_mortality: 'nt65-c7a7', // NCHS Injury mortality (all mechanisms + intents - annual)
 } as const;
 
 export type DatasetName = keyof typeof DATASETS;
@@ -197,6 +235,32 @@ export const DATASET_DESCRIPTIONS: Record<DatasetName, string> = {
   water_fluoridation: 'Water Systems: Community water fluoridation statistics',
   alcohol_impaired_driving: 'FARS: Alcohol-impaired driving deaths by state',
   brfss_healthcare_access_historical: 'BRFSS: Historical health care access/coverage trends 1995-2010',
+
+  // Phase 4 Expansion Descriptions
+  nndss_arboviral: 'NNDSS: Arboviral diseases surveillance (West Nile, encephalitis) - weekly provisional',
+  nndss_hepatitis: 'NNDSS: Hepatitis A, B, C surveillance (acute + perinatal) - weekly provisional',
+  nndss_tuberculosis: 'NNDSS: Tuberculosis surveillance (weekly provisional 2020-2022)',
+  nndss_rubella: 'NNDSS: Rubella & congenital rubella syndrome - weekly provisional',
+  nndss_pertussis: 'NNDSS: Pertussis & poliomyelitis surveillance - weekly provisional',
+  nndss_haemophilus: 'NNDSS: Haemophilus influenzae invasive disease (age <5) - weekly provisional',
+  nndss_qfever: 'NNDSS: Q fever (acute & chronic) surveillance - weekly provisional',
+  nndss_botulism: 'NNDSS: Botulism (foodborne, infant, wound) - weekly provisional',
+  nndss_tb_2019: 'NNDSS: Tuberculosis surveillance 2019 (historical trends)',
+  nndss_tb_2018: 'NNDSS: Tuberculosis surveillance 2018 (historical trends)',
+  nndss_tb_2017: 'NNDSS: Tuberculosis surveillance 2017 (historical trends)',
+  nndss_tb_2016: 'NNDSS: Tuberculosis surveillance 2016 (historical trends)',
+  nndss_tb_2015: 'NNDSS: Tuberculosis surveillance 2015 (historical trends)',
+  nndss_tb_2014: 'NNDSS: Tuberculosis surveillance 2014 (historical trends)',
+  covid_vax_jurisdiction: 'COVID-19 Vaccination: National/state/territory level (weekly updates)',
+  covid_vax_county: 'COVID-19 Vaccination: County-level + equity metrics (SVI, urban/rural)',
+  covid_vax_respiratory_weekly: 'Respiratory Virus Vaccination: Weekly flu/COVID/RSV coverage (all ages)',
+  covid_vax_age_trends: 'COVID-19 Vaccination: Age group trends & case correlation (archived Oct 2022)',
+  overdose_provisional_state: 'VSRR: Provisional drug overdose deaths (monthly state-level)',
+  overdose_county: 'VSRR: County-level overdose deaths (12-month ending provisional)',
+  overdose_by_drug: 'VSRR: Overdose deaths by specific drugs (opioids, fentanyl, cocaine, meth)',
+  overdose_demographics: 'VSRR: Overdose deaths by demographics (age, sex, race, drug type)',
+  overdose_nowcast: 'VSRR: Early model-based overdose estimates (nowcasting with lag adjustment)',
+  nchs_injury_mortality: 'NCHS: Injury mortality - all mechanisms and intents (annual)',
 };
 
 /**

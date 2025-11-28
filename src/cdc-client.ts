@@ -753,4 +753,166 @@ export class CDCClient {
       data,
     };
   }
+
+  /**
+   * === PHASE 4 EXPANSION ===
+   * Real-time outbreak detection, vaccination tracking, overdose monitoring
+   */
+
+  /**
+   * Get NNDSS surveillance data (National Notifiable Diseases Surveillance System)
+   * Real-time disease outbreak detection for 50+ notifiable diseases
+   */
+  async getNNDSSSurveillance(
+    nndss_disease: string = 'all',
+    year?: string,
+    state?: string,
+    limit: number = 100,
+    offset: number = 0
+  ): Promise<CDCResponse> {
+    // Dataset mapping for different diseases
+    const datasetMap: Record<string, string> = {
+      arboviral: DATASETS.nndss_arboviral,
+      hepatitis: DATASETS.nndss_hepatitis,
+      tuberculosis: year
+        ? (DATASETS[`nndss_tb_${year}` as keyof typeof DATASETS] as string) || DATASETS.nndss_tuberculosis
+        : DATASETS.nndss_tuberculosis,
+      rubella: DATASETS.nndss_rubella,
+      pertussis: DATASETS.nndss_pertussis,
+      haemophilus: DATASETS.nndss_haemophilus,
+      qfever: DATASETS.nndss_qfever,
+      botulism: DATASETS.nndss_botulism,
+    };
+
+    const datasetId = datasetMap[nndss_disease] || DATASETS.nndss_tuberculosis;
+
+    const params: Record<string, any> = {
+      $limit: Math.min(limit, 50000),
+      $offset: offset,
+    };
+
+    // Add state filter if provided
+    const whereClauses: string[] = [];
+    if (state) {
+      whereClauses.push(`reporting_area='${state.toUpperCase()}'`);
+    }
+
+    if (whereClauses.length > 0) {
+      params.$where = whereClauses.join(' AND ');
+    }
+
+    const data = await this.makeRequest(datasetId, params);
+
+    return {
+      dataset: `nndss_${nndss_disease}`,
+      count: data.length,
+      data,
+    };
+  }
+
+  /**
+   * Get COVID-19 vaccination data (county-level tracking with equity metrics)
+   */
+  async getCovidVaccination(
+    vax_geography: string = 'state',
+    state?: string,
+    county?: string,
+    equity_metrics?: boolean,
+    limit: number = 100,
+    offset: number = 0
+  ): Promise<CDCResponse> {
+    // Choose dataset based on geographic level
+    let datasetId: string;
+    if (vax_geography === 'county' || county) {
+      datasetId = DATASETS.covid_vax_county;
+    } else if (vax_geography === 'national') {
+      datasetId = DATASETS.covid_vax_jurisdiction;
+    } else {
+      datasetId = DATASETS.covid_vax_jurisdiction;
+    }
+
+    const params: Record<string, any> = {
+      $limit: Math.min(limit, 50000),
+      $offset: offset,
+      $order: 'date DESC',
+    };
+
+    // Build filters
+    const whereClauses: string[] = [];
+    if (state) whereClauses.push(`location='${state.toUpperCase()}'` + ` OR stateabbr='${state.toUpperCase()}' OR recip_state='${state.toUpperCase()}'`);
+    if (county) whereClauses.push(`recip_county='${county}' OR county='${county}'`);
+
+    if (whereClauses.length > 0) {
+      params.$where = whereClauses.join(' AND ');
+    }
+
+    const data = await this.makeRequest(datasetId, params);
+
+    return {
+      dataset: `covid_vax_${vax_geography}`,
+      count: data.length,
+      data,
+    };
+  }
+
+  /**
+   * Get drug overdose surveillance data
+   * Real-time overdose crisis monitoring with drug-specific tracking
+   */
+  async getOverdoseSurveillance(
+    overdose_geography: string = 'state',
+    drug_type: string = 'all',
+    provisional: boolean = true,
+    state?: string,
+    county?: string,
+    limit: number = 100,
+    offset: number = 0
+  ): Promise<CDCResponse> {
+    // Choose dataset based on parameters
+    let datasetId: string;
+    if (county || overdose_geography === 'county') {
+      datasetId = DATASETS.overdose_county;
+    } else if (drug_type !== 'all') {
+      datasetId = DATASETS.overdose_by_drug;
+    } else if (provisional) {
+      datasetId = DATASETS.overdose_provisional_state;
+    } else {
+      datasetId = DATASETS.overdose_demographics;
+    }
+
+    const params: Record<string, any> = {
+      $limit: Math.min(limit, 50000),
+      $offset: offset,
+    };
+
+    // Build filters
+    const whereClauses: string[] = [];
+    if (state) whereClauses.push(`state='${state.toUpperCase()}' OR state_name='${state}' OR stateabbr='${state.toUpperCase()}'`);
+    if (county) whereClauses.push(`county='${county}'`);
+    if (drug_type !== 'all') {
+      // Drug type mapping for indicator field
+      const drugMap: Record<string, string> = {
+        opioid: "indicator LIKE '%Opioid%' OR indicator LIKE '%Synthetic opioids%'",
+        fentanyl: "indicator LIKE '%Fentanyl%' OR indicator LIKE '%Synthetic opioids%'",
+        heroin: "indicator LIKE '%Heroin%'",
+        cocaine: "indicator LIKE '%Cocaine%'",
+        methamphetamine: "indicator LIKE '%Methamphetamine%' OR indicator LIKE '%Psychostimulants%'",
+      };
+      if (drugMap[drug_type]) {
+        whereClauses.push(`(${drugMap[drug_type]})`);
+      }
+    }
+
+    if (whereClauses.length > 0) {
+      params.$where = whereClauses.join(' AND ');
+    }
+
+    const data = await this.makeRequest(datasetId, params);
+
+    return {
+      dataset: `overdose_${overdose_geography}_${drug_type}`,
+      count: data.length,
+      data,
+    };
+  }
 }

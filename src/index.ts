@@ -29,7 +29,7 @@ const cdcClient = new CDCClient(appToken);
 const server = new Server(
   {
     name: 'cdc-mcp-server',
-    version: '1.3.0', // Tier 1 + 2 + 3 Expansion - 53 datasets
+    version: '1.4.0', // Phase 4 Complete - 73 datasets (added NNDSS, COVID vax, overdose)
   },
   {
     capabilities: {
@@ -43,7 +43,7 @@ const CDC_TOOL: Tool = {
   name: 'cdc_health_data',
   description: `Unified tool for CDC public health data operations: access disease prevalence, chronic disease indicators, behavioral risk factors, and health surveillance data from CDC's Socrata Open Data API (SODA).
 
-Available data sources (53 datasets - Tier 1 + 2 + 3 Complete Expansion):
+Available data sources (73 datasets - Phase 4 Complete: Critical Surveillance):
 - PLACES: Local disease prevalence data at county, place, census tract, and ZIP code levels
 - BRFSS: Behavioral Risk Factor Surveillance System for chronic disease risk factors (comprehensive 2011-present)
 - YRBSS: Youth Risk Behavior Surveillance (substance use, mental health, violence, sexual behaviors)
@@ -56,6 +56,9 @@ Available data sources (53 datasets - Tier 1 + 2 + 3 Complete Expansion):
 - VSRR: Vital Statistics Rapid Release for provisional mortality data
 - Nutrition/Physical Activity/Obesity: Behavioral and environmental data
 - Disease-specific datasets: Diabetes, obesity, heart disease, cancer, etc.
+- NNDSS: National Notifiable Diseases Surveillance (real-time outbreak detection for 50+ diseases)
+- COVID-19 Vaccination: County-level tracking with equity metrics (SVI, urban/rural)
+- Drug Overdose: Real-time crisis monitoring with drug-specific tracking (fentanyl, opioids, etc.)
 
 Use the method parameter to specify the operation type.`,
   inputSchema: {
@@ -81,6 +84,10 @@ Use the method parameter to specify the operation type.`,
           'get_injury_surveillance',
           'get_tobacco_policy',
           'get_infectious_disease',
+          // Phase 4 Methods
+          'get_nndss_surveillance',
+          'get_covid_vaccination',
+          'get_overdose_surveillance',
         ],
         description: `The operation to perform:
 - get_places_data: Get PLACES local disease prevalence data
@@ -270,6 +277,42 @@ TIER 2 EXPANSION METHODS:
       pathogen: {
         type: 'string',
         description: 'For get_infectious_disease: Pathogen name for foodborne/waterborne outbreaks',
+      },
+
+      // === PHASE 4 EXPANSION PARAMETERS ===
+
+      // NNDSS surveillance parameters
+      nndss_disease: {
+        type: 'string',
+        enum: ['arboviral', 'hepatitis', 'tuberculosis', 'rubella', 'pertussis', 'haemophilus', 'qfever', 'botulism', 'all'],
+        description: 'For get_nndss_surveillance: Notifiable disease category (default: all)',
+      },
+
+      // COVID vaccination parameters
+      vax_geography: {
+        type: 'string',
+        enum: ['national', 'state', 'county'],
+        description: 'For get_covid_vaccination: Geographic level (default: state)',
+      },
+      equity_metrics: {
+        type: 'boolean',
+        description: 'For get_covid_vaccination: Include SVI and urban/rural equity metrics',
+      },
+
+      // Drug overdose parameters
+      overdose_geography: {
+        type: 'string',
+        enum: ['national', 'state', 'county'],
+        description: 'For get_overdose_surveillance: Geographic level (default: state)',
+      },
+      drug_type: {
+        type: 'string',
+        enum: ['opioid', 'fentanyl', 'heroin', 'cocaine', 'methamphetamine', 'all'],
+        description: 'For get_overdose_surveillance: Specific drug type (default: all)',
+      },
+      provisional: {
+        type: 'boolean',
+        description: 'For get_overdose_surveillance: Use provisional data (true) or finalized (false)',
       },
     },
     required: ['method'],
@@ -464,6 +507,41 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           params.serotype,
           params.pathogen,
           params.year ? parseInt(params.year) : undefined,
+          params.limit || 100,
+          params.offset || 0
+        );
+        break;
+
+      // === PHASE 4 EXPANSION METHODS ===
+
+      case 'get_nndss_surveillance':
+        result = await cdcClient.getNNDSSSurveillance(
+          params.nndss_disease || 'all',
+          params.year,
+          params.state,
+          params.limit || 100,
+          params.offset || 0
+        );
+        break;
+
+      case 'get_covid_vaccination':
+        result = await cdcClient.getCovidVaccination(
+          params.vax_geography || 'state',
+          params.state,
+          params.county,
+          params.equity_metrics,
+          params.limit || 100,
+          params.offset || 0
+        );
+        break;
+
+      case 'get_overdose_surveillance':
+        result = await cdcClient.getOverdoseSurveillance(
+          params.overdose_geography || 'state',
+          params.drug_type || 'all',
+          params.provisional !== undefined ? params.provisional : true,
+          params.state,
+          params.county,
           params.limit || 100,
           params.offset || 0
         );

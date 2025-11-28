@@ -25,7 +25,11 @@ export interface CDCToolRequest {
     // Tier 2 Expansion Methods
     | 'get_injury_surveillance'
     | 'get_tobacco_policy'
-    | 'get_infectious_disease';
+    | 'get_infectious_disease'
+    // Phase 4 Methods
+    | 'get_nndss_surveillance'
+    | 'get_covid_vaccination'
+    | 'get_overdose_surveillance';
 
   // PLACES parameters
   geography_level?: 'county' | 'place' | 'tract' | 'zcta';
@@ -75,6 +79,21 @@ export interface CDCToolRequest {
   disease?: 'pneumococcal' | 'foodborne' | 'waterborne';
   serotype?: string; // For pneumococcal disease
   pathogen?: string; // For foodborne outbreaks
+
+  // === PHASE 4 EXPANSION PARAMETERS ===
+
+  // NNDSS surveillance parameters
+  nndss_disease?: 'arboviral' | 'hepatitis' | 'tuberculosis' | 'rubella' | 'pertussis' |
+                  'haemophilus' | 'qfever' | 'botulism' | 'all';
+
+  // COVID vaccination parameters
+  vax_geography?: 'national' | 'state' | 'county';
+  equity_metrics?: boolean; // Include SVI, urban/rural classification
+
+  // Drug overdose parameters
+  overdose_geography?: 'national' | 'state' | 'county';
+  drug_type?: 'opioid' | 'fentanyl' | 'heroin' | 'cocaine' | 'methamphetamine' | 'all';
+  provisional?: boolean; // True for provisional data, false for finalized
 
   // Generic search parameters
   dataset_name?: DatasetName | string;
