@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "description": "Example MCP client configuration for CDC MCP Server",
+  "mcpServers": {
+    "cdc-mcp-server": {
+      "command": "node",
+      "args": [
+        "/absolute/path/to/cdc-mcp-server/build/index.js"
+      ],
+      "env": {
+        "CDC_APP_TOKEN": "your_socrata_app_token_here_optional"
+      }
+    }
+  }
+}

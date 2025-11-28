@@ -22,7 +22,7 @@ export const DATASETS = {
   places_county_2023: 'i46a-9kgh',
   places_place_2024: 'eav7-hnsx',
   places_tract_2024: 'q9s5-f4ms',
-  places_zcta_2024: 'csmw-bzzp',
+  places_zcta_2024: 'qnzd-25i4', // Fixed: was 'csmw-bzzp' (404 error)
 
   // BRFSS: Behavioral Risk Factor Surveillance System (6 datasets)
   brfss_obesity_national: 'tcmp-75zb',
