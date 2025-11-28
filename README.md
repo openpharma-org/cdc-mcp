@@ -2,16 +2,19 @@
 
 A comprehensive Node.js MCP (Model Context Protocol) server providing access to CDC (Centers for Disease Control and Prevention) public health data through the Socrata Open Data API (SODA).
 
-**Version**: 1.3.0
-**Total Datasets**: 53 (no authentication required)
-**Surveillance Systems**: 15 different CDC programs
-**Health Measures**: 80+ indicators across chronic disease, behavioral risk, environmental health, and more
+**Version**: 1.4.0
+**Total Datasets**: 73 (no authentication required)
+**Surveillance Systems**: 18 different CDC programs
+**Health Measures**: 100+ indicators across chronic disease, behavioral risk, environmental health, outbreak detection, vaccination, and drug overdose
 
 ## Features
 
 - **TypeScript Implementation**: Built with @modelcontextprotocol/sdk
-- **Comprehensive Coverage**: 53 public datasets across 15 surveillance systems
-- **Unified Interface**: Single tool with 15 specialized methods
+- **Comprehensive Coverage**: 73 public datasets across 18 surveillance systems
+- **Unified Interface**: Single tool with 18 specialized methods
+- **Real-Time Surveillance**: NNDSS outbreak detection for 50+ notifiable diseases
+- **COVID-19 Vaccination**: County-level tracking with equity metrics (SVI, urban/rural)
+- **Drug Overdose Crisis**: Real-time monitoring with drug-specific tracking (fentanyl, opioids)
 - **Rate Limiting**: Built-in rate limiting (500ms delay) to respect API quotas
 - **App Token Support**: Enhanced rate limits (1,000 requests/hour) with valid app token
 - **Flexible Querying**: Support for filtering, pagination, and custom SoQL queries
@@ -19,7 +22,7 @@ A comprehensive Node.js MCP (Model Context Protocol) server providing access to 
 
 ## Available Data Sources
 
-### Dataset Coverage (53 Total)
+### Dataset Coverage (73 Total)
 
 | Category | Datasets | Key Features |
 |----------|----------|--------------|
@@ -38,6 +41,9 @@ A comprehensive Node.js MCP (Model Context Protocol) server providing access to 
 | **Nutrition** | 3 | Behavioral, policy, youth-specific |
 | **Disease-Specific** | 4 | Heart disease, diabetes, cancer, COVID |
 | **Historical** | 1 | Pre-ACA health care access (1995-2010) |
+| **🔥 NNDSS** | **14** | **Real-time outbreak detection (50+ notifiable diseases)** |
+| **🔥 COVID-19 Vaccination** | **4** | **County-level tracking with equity metrics** |
+| **🔥 Drug Overdose** | **6** | **Provisional + finalized overdose data by drug type** |
 
 ## Installation
 
@@ -404,6 +410,118 @@ Foodborne outbreaks:
 
 ---
 
+### Phase 4 Methods: Critical Surveillance Gaps (3)
+
+#### 16. `get_nndss_surveillance`
+National Notifiable Diseases Surveillance System - real-time outbreak detection for 50+ diseases.
+
+**Parameters**:
+- `nndss_disease`: "arboviral", "hepatitis", "tuberculosis", "rubella", "pertussis", "haemophilus", "qfever", "botulism", "all" (default: "all")
+- `year`: Year filter (for historical TB data: 2014-2019)
+- `state`: State abbreviation
+- `limit`, `offset`: Pagination
+
+**Examples**:
+
+Arboviral disease surveillance:
+```json
+{
+  "method": "get_nndss_surveillance",
+  "nndss_disease": "arboviral",
+  "state": "FL",
+  "year": "2024"
+}
+```
+
+Historical tuberculosis data:
+```json
+{
+  "method": "get_nndss_surveillance",
+  "nndss_disease": "tuberculosis",
+  "year": "2019",
+  "state": "CA"
+}
+```
+
+#### 17. `get_covid_vaccination`
+COVID-19 vaccination tracking with equity metrics.
+
+**Parameters**:
+- `vax_geography`: "national", "state", "county" (default: "state")
+- `state`: State abbreviation
+- `county`: County name
+- `equity_metrics`: Include SVI and urban/rural classification (boolean)
+- `limit`, `offset`: Pagination
+
+**Examples**:
+
+State-level vaccination rates:
+```json
+{
+  "method": "get_covid_vaccination",
+  "vax_geography": "state",
+  "state": "TX"
+}
+```
+
+County-level with equity metrics:
+```json
+{
+  "method": "get_covid_vaccination",
+  "vax_geography": "county",
+  "state": "NY",
+  "county": "New York",
+  "equity_metrics": true
+}
+```
+
+#### 18. `get_overdose_surveillance`
+Drug overdose crisis monitoring with drug-specific tracking.
+
+**Parameters**:
+- `overdose_geography`: "national", "state", "county" (default: "state")
+- `drug_type`: "opioid", "fentanyl", "heroin", "cocaine", "methamphetamine", "all" (default: "all")
+- `provisional`: Use provisional data (true) or finalized (false) - default: true
+- `state`: State abbreviation
+- `county`: County name
+- `limit`, `offset`: Pagination
+
+**Examples**:
+
+Fentanyl overdoses by state:
+```json
+{
+  "method": "get_overdose_surveillance",
+  "overdose_geography": "state",
+  "drug_type": "fentanyl",
+  "state": "OH",
+  "provisional": true
+}
+```
+
+County-level opioid deaths:
+```json
+{
+  "method": "get_overdose_surveillance",
+  "overdose_geography": "county",
+  "drug_type": "opioid",
+  "county": "Alameda",
+  "state": "CA"
+}
+```
+
+All overdoses (finalized data):
+```json
+{
+  "method": "get_overdose_surveillance",
+  "overdose_geography": "national",
+  "drug_type": "all",
+  "provisional": false
+}
+```
+
+---
+
 ## Common PLACES Measure IDs
 
 ### Chronic Diseases
@@ -439,7 +557,7 @@ Foodborne outbreaks:
 
 ## Dataset Reference
 
-### Complete Dataset List (53)
+### Complete Dataset List (73)
 
 <details>
 <summary>Click to expand full dataset list</summary>
@@ -522,6 +640,36 @@ Foodborne outbreaks:
 
 **Historical (1 dataset)**:
 - Already listed under BRFSS
+
+**NNDSS - National Notifiable Diseases Surveillance (14 datasets)**:
+- `nndss_arboviral` - Arboviral diseases (Zika, West Nile, etc.)
+- `nndss_hepatitis` - Viral hepatitis A, B, C
+- `nndss_tuberculosis` - Current TB surveillance
+- `nndss_rubella` - Rubella and congenital rubella
+- `nndss_pertussis` - Whooping cough surveillance
+- `nndss_haemophilus` - Haemophilus influenzae disease
+- `nndss_qfever` - Q fever surveillance
+- `nndss_botulism` - Botulism surveillance
+- `nndss_tb_2019` - Historical TB 2019
+- `nndss_tb_2018` - Historical TB 2018
+- `nndss_tb_2017` - Historical TB 2017
+- `nndss_tb_2016` - Historical TB 2016
+- `nndss_tb_2015` - Historical TB 2015
+- `nndss_tb_2014` - Historical TB 2014
+
+**COVID-19 Vaccination (4 datasets)**:
+- `covid_vax_jurisdiction` - State/territory vaccination rates
+- `covid_vax_county` - County-level vaccination coverage
+- `covid_vax_respiratory_weekly` - Weekly respiratory virus vaccination
+- `covid_vax_age_trends` - Age-stratified vaccination trends
+
+**Drug Overdose Surveillance (6 datasets)**:
+- `overdose_provisional_state` - Provisional state-level overdose deaths
+- `overdose_county` - County-level overdose mortality
+- `overdose_by_drug` - Drug-specific overdose deaths
+- `overdose_demographics` - Demographic-stratified overdose data
+- `overdose_nowcast` - Lag-adjusted overdose estimates
+- `nchs_injury_mortality` - Comprehensive injury mortality data
 
 </details>
 
@@ -616,6 +764,11 @@ Data is provided by CDC and is in the public domain.
 
 ## Version History
 
+- **v1.4.0** (2025-11-28): Phase 4 Complete - Critical surveillance gaps filled - 73 datasets total
+  - ✅ NNDSS: 14 datasets for real-time outbreak detection (50+ notifiable diseases)
+  - ✅ COVID-19 Vaccination: 4 datasets with county-level tracking and equity metrics
+  - ✅ Drug Overdose: 6 datasets with provisional data and drug-specific tracking
+  - 🔥 **Transformation**: From chronic disease monitoring → comprehensive public health surveillance
 - **v1.3.0** (2025-11-28): Tier 3 expansion + critical ZCTA fix - 53 datasets total
 - **v1.2.0** (2025-11-28): Tier 2 expansion - 45 datasets
 - **v1.1.0** (2025-11-28): Tier 1 expansion - 33 datasets
