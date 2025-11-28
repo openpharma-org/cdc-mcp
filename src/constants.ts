@@ -1,8 +1,9 @@
 /**
  * CDC Dataset Identifiers for Socrata Open Data API (SODA)
  *
- * Total: 23 public datasets (no authentication required)
- * Coverage: 40+ health measures across multiple surveillance systems
+ * Total: 33 public datasets (no authentication required) - TIER 1 EXPANSION
+ * Coverage: 60+ health measures across multiple surveillance systems
+ * Last Updated: 2025-11-28
  */
 
 export const CDC_BASE_URL = 'https://data.cdc.gov/resource';
@@ -50,6 +51,35 @@ export const DATASETS = {
   // NCHS & Tobacco (2 datasets)
   nchs_death_rates_life_expectancy: 'w9j2-ggv5', // Since 1900
   adult_tobacco_consumption: 'rnvb-cpxx', // 2000+
+
+  // === TIER 1 EXPANSION: HIGH PRIORITY DATASETS (10 datasets) ===
+  // Added 2025-11-28 - See NEW_DATASETS_DISCOVERED.md for details
+
+  // Comprehensive BRFSS (1 dataset)
+  brfss_comprehensive: 'dttw-5yxu', // BRFSS Prevalence Data (2011-present) - 30+ health measures
+
+  // Youth Health Surveillance (1 dataset)
+  yrbss_high_school: 'svam-8dhg', // Youth Risk Behavior Surveillance System (substance use, mental health, violence)
+
+  // Respiratory Surveillance (1 dataset)
+  respiratory_combined: 'kvib-3txy', // RSV/COVID-19/Flu Combined Hospitalizations
+
+  // Vaccinations (1 dataset)
+  teen_vaccinations: 'ee48-w5t6', // Teen Vaccination Coverage (13-17 years) - HPV, Tdap, MenACWY
+
+  // Vital Statistics - Birth & Death (2 datasets)
+  vsrr_birth_quarterly: '76vv-a7x8', // VSRR Quarterly Birth Indicators (provisional)
+  death_rates_major_causes: '6rkc-nb2q', // Age-Adjusted Death Rates for Leading Causes
+
+  // Environmental Health (1 dataset)
+  air_quality_tracking: 'cjae-szjv', // Air Quality Measures - National Environmental Health Tracking
+
+  // Tobacco Impact & Policy (1 dataset)
+  sammec_smoking_impact: '4yyu-3s69', // SAMMEC - Smoking-Attributable Mortality, Morbidity, Economic Costs
+
+  // Oral & Vision Health (2 datasets)
+  oral_health_indicators: 'jz6n-v26y', // NOHSS Adult Oral Health Indicators
+  vision_health: 'vkwg-yswv', // Vision and Eye Health Surveillance (BRFSS module)
 } as const;
 
 export type DatasetName = keyof typeof DATASETS;
@@ -81,6 +111,18 @@ export const DATASET_DESCRIPTIONS: Record<DatasetName, string> = {
   vsrr_infant_mortality: 'VSRR: Quarterly provisional infant mortality estimates',
   nchs_death_rates_life_expectancy: 'NCHS: Death rates and life expectancy at birth (since 1900)',
   adult_tobacco_consumption: 'Adult tobacco consumption in the U.S. (2000+)',
+
+  // Tier 1 Expansion Descriptions
+  brfss_comprehensive: 'BRFSS: Comprehensive prevalence data 2011-present (30+ health measures)',
+  yrbss_high_school: 'YRBSS: High school youth risk behaviors (substance use, mental health, violence)',
+  respiratory_combined: 'Respiratory Surveillance: Combined RSV/COVID-19/Flu hospitalizations',
+  teen_vaccinations: 'Vaccination Coverage: Adolescents 13-17 years (HPV, Tdap, MenACWY)',
+  vsrr_birth_quarterly: 'VSRR: Quarterly provisional birth indicators (rates, cesarean, preterm)',
+  death_rates_major_causes: 'NCHS: Age-adjusted death rates for leading causes of death',
+  air_quality_tracking: 'Environmental Health: Air quality measures (PM2.5, ozone) with health tracking',
+  sammec_smoking_impact: 'SAMMEC: Smoking-attributable mortality, morbidity, and economic costs',
+  oral_health_indicators: 'NOHSS: Adult oral health indicators (dental visits, tooth loss, cancer screening)',
+  vision_health: 'BRFSS: Vision and eye health surveillance (blindness, exams, diabetic retinopathy)',
 };
 
 /**

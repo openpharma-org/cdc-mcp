@@ -13,7 +13,15 @@ export interface CDCToolRequest {
     | 'get_brfss_data'
     | 'search_dataset'
     | 'get_available_measures'
-    | 'list_datasets';
+    | 'list_datasets'
+    // Tier 1 Expansion Methods
+    | 'get_yrbss_data'
+    | 'get_respiratory_surveillance'
+    | 'get_vaccination_coverage'
+    | 'get_birth_statistics'
+    | 'get_environmental_health'
+    | 'get_tobacco_impact'
+    | 'get_oral_vision_health';
 
   // PLACES parameters
   geography_level?: 'county' | 'place' | 'tract' | 'zcta';
@@ -24,6 +32,30 @@ export interface CDCToolRequest {
 
   // BRFSS parameters
   dataset_type?: 'obesity_national' | 'obesity_state' | 'diabetes' | 'asthma';
+
+  // Tier 1 Expansion Parameters
+  // YRBSS parameters
+  topic?: 'substance_use' | 'mental_health' | 'violence' | 'sexual_behaviors' | 'nutrition' | 'physical_activity';
+
+  // Respiratory parameters
+  virus?: 'rsv' | 'covid' | 'flu' | 'combined';
+
+  // Vaccination parameters
+  age_group?: 'teen' | 'pregnant' | 'kindergarten';
+  vaccine_type?: 'hpv' | 'tdap' | 'menacwy' | 'flu';
+
+  // Birth statistics parameters
+  indicator?: 'birth_rate' | 'preterm' | 'cesarean' | 'low_birth_weight';
+
+  // Environmental health parameters
+  pollutant?: 'pm25' | 'ozone' | 'combined';
+  county?: string;
+
+  // Tobacco impact parameters
+  impact_type?: 'mortality' | 'morbidity' | 'economic_cost';
+
+  // Oral/Vision health parameters
+  health_domain?: 'oral' | 'vision';
 
   // Generic search parameters
   dataset_name?: DatasetName | string;
