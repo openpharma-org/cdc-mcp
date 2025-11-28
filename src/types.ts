@@ -21,7 +21,11 @@ export interface CDCToolRequest {
     | 'get_birth_statistics'
     | 'get_environmental_health'
     | 'get_tobacco_impact'
-    | 'get_oral_vision_health';
+    | 'get_oral_vision_health'
+    // Tier 2 Expansion Methods
+    | 'get_injury_surveillance'
+    | 'get_tobacco_policy'
+    | 'get_infectious_disease';
 
   // PLACES parameters
   geography_level?: 'county' | 'place' | 'tract' | 'zcta';
@@ -56,6 +60,21 @@ export interface CDCToolRequest {
 
   // Oral/Vision health parameters
   health_domain?: 'oral' | 'vision';
+
+  // === TIER 2 EXPANSION PARAMETERS ===
+
+  // Injury surveillance parameters
+  injury_type?: 'tbi' | 'motor_vehicle' | 'all';
+  mechanism?: 'fall' | 'motor_vehicle' | 'assault' | 'sports' | 'all';
+
+  // Tobacco policy parameters
+  policy_type?: 'smokefree_air' | 'licensure' | 'tax' | 'medicaid_cessation' | 'ecigarette';
+  venue?: 'workplace' | 'restaurant' | 'bar' | 'government' | 'school' | 'all';
+
+  // Infectious disease parameters
+  disease?: 'pneumococcal' | 'foodborne' | 'waterborne';
+  serotype?: string; // For pneumococcal disease
+  pathogen?: string; // For foodborne outbreaks
 
   // Generic search parameters
   dataset_name?: DatasetName | string;

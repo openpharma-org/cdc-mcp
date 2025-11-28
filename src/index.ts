@@ -29,7 +29,7 @@ const cdcClient = new CDCClient(appToken);
 const server = new Server(
   {
     name: 'cdc-mcp-server',
-    version: '1.1.0', // Tier 1 Expansion - 33 datasets
+    version: '1.2.0', // Tier 1 & 2 Expansion - 45 datasets
   },
   {
     capabilities: {
@@ -43,7 +43,7 @@ const CDC_TOOL: Tool = {
   name: 'cdc_health_data',
   description: `Unified tool for CDC public health data operations: access disease prevalence, chronic disease indicators, behavioral risk factors, and health surveillance data from CDC's Socrata Open Data API (SODA).
 
-Available data sources (33 datasets - Tier 1 Expansion):
+Available data sources (45 datasets - Tier 1 & 2 Expansion):
 - PLACES: Local disease prevalence data at county, place, census tract, and ZIP code levels
 - BRFSS: Behavioral Risk Factor Surveillance System for chronic disease risk factors (comprehensive 2011-present)
 - YRBSS: Youth Risk Behavior Surveillance (substance use, mental health, violence, sexual behaviors)
@@ -77,6 +77,10 @@ Use the method parameter to specify the operation type.`,
           'get_environmental_health',
           'get_tobacco_impact',
           'get_oral_vision_health',
+          // Tier 2 Expansion Methods
+          'get_injury_surveillance',
+          'get_tobacco_policy',
+          'get_infectious_disease',
         ],
         description: `The operation to perform:
 - get_places_data: Get PLACES local disease prevalence data
@@ -92,7 +96,12 @@ TIER 1 EXPANSION METHODS:
 - get_birth_statistics: Birth rates, preterm births, cesarean delivery data
 - get_environmental_health: Air quality tracking (PM2.5, ozone) with health impacts
 - get_tobacco_impact: Smoking-attributable mortality, morbidity, economic costs
-- get_oral_vision_health: Oral and vision health indicators`,
+- get_oral_vision_health: Oral and vision health indicators
+
+TIER 2 EXPANSION METHODS:
+- get_injury_surveillance: TBI surveillance - emergency visits, hospitalizations, deaths by mechanism
+- get_tobacco_policy: Smokefree air legislation and Medicaid cessation coverage by state
+- get_infectious_disease: Pneumococcal disease and foodborne/waterborne outbreak surveillance`,
       },
 
       // PLACES parameters
@@ -220,6 +229,47 @@ TIER 1 EXPANSION METHODS:
         type: 'string',
         enum: ['oral', 'vision'],
         description: 'For get_oral_vision_health: Health domain (oral or vision)',
+      },
+
+      // === TIER 2 EXPANSION PARAMETERS ===
+
+      // Injury surveillance parameters
+      injury_type: {
+        type: 'string',
+        enum: ['tbi', 'motor_vehicle', 'all'],
+        description: 'For get_injury_surveillance: Type of injury (default: tbi)',
+      },
+      mechanism: {
+        type: 'string',
+        enum: ['fall', 'motor_vehicle', 'assault', 'sports', 'all'],
+        description: 'For get_injury_surveillance: Injury mechanism filter',
+      },
+
+      // Tobacco policy parameters
+      policy_type: {
+        type: 'string',
+        enum: ['smokefree_air', 'licensure', 'tax', 'medicaid_cessation', 'ecigarette'],
+        description: 'For get_tobacco_policy: Type of tobacco policy',
+      },
+      venue: {
+        type: 'string',
+        enum: ['workplace', 'restaurant', 'bar', 'government', 'school', 'all'],
+        description: 'For get_tobacco_policy: Venue type for smokefree air legislation',
+      },
+
+      // Infectious disease parameters
+      disease: {
+        type: 'string',
+        enum: ['pneumococcal', 'foodborne', 'waterborne'],
+        description: 'For get_infectious_disease: Disease type',
+      },
+      serotype: {
+        type: 'string',
+        description: 'For get_infectious_disease: Pneumococcal serotype filter (e.g., "19A", "3")',
+      },
+      pathogen: {
+        type: 'string',
+        description: 'For get_infectious_disease: Pathogen name for foodborne/waterborne outbreaks',
       },
     },
     required: ['method'],
@@ -371,6 +421,48 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         result = await cdcClient.getOralVisionHealth(
           params.health_domain,
           params.state,
+          params.year ? parseInt(params.year) : undefined,
+          params.limit || 100,
+          params.offset || 0
+        );
+        break;
+
+      // === TIER 2 EXPANSION METHODS ===
+
+      case 'get_injury_surveillance':
+        result = await cdcClient.getInjurySurveillance(
+          params.injury_type || 'tbi',
+          params.state,
+          params.mechanism,
+          params.year ? parseInt(params.year) : undefined,
+          params.limit || 100,
+          params.offset || 0
+        );
+        break;
+
+      case 'get_tobacco_policy':
+        if (!params.policy_type) {
+          throw new Error('policy_type is required for get_tobacco_policy');
+        }
+        result = await cdcClient.getTobaccoPolicy(
+          params.policy_type,
+          params.state,
+          params.venue,
+          params.year ? parseInt(params.year) : undefined,
+          params.limit || 100,
+          params.offset || 0
+        );
+        break;
+
+      case 'get_infectious_disease':
+        if (!params.disease) {
+          throw new Error('disease is required for get_infectious_disease');
+        }
+        result = await cdcClient.getInfectiousDisease(
+          params.disease,
+          params.state,
+          params.serotype,
+          params.pathogen,
           params.year ? parseInt(params.year) : undefined,
           params.limit || 100,
           params.offset || 0

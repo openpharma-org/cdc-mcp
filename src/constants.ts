@@ -1,8 +1,8 @@
 /**
  * CDC Dataset Identifiers for Socrata Open Data API (SODA)
  *
- * Total: 33 public datasets (no authentication required) - TIER 1 EXPANSION
- * Coverage: 60+ health measures across multiple surveillance systems
+ * Total: 45 public datasets (no authentication required) - TIER 1 + TIER 2 EXPANSION
+ * Coverage: 70+ health measures across multiple surveillance systems
  * Last Updated: 2025-11-28
  */
 
@@ -80,6 +80,37 @@ export const DATASETS = {
   // Oral & Vision Health (2 datasets)
   oral_health_indicators: 'jz6n-v26y', // NOHSS Adult Oral Health Indicators
   vision_health: 'vkwg-yswv', // Vision and Eye Health Surveillance (BRFSS module)
+
+  // === TIER 2 EXPANSION: HIGH VALUE DATASETS (12 datasets) ===
+  // Added 2025-11-28 - Policy-relevant, niche specializations
+
+  // Respiratory Surveillance Extended (1 dataset)
+  rsv_hospitalizations: '29hc-w46k', // RSV Hospitalizations from RSV-NET
+
+  // Vaccination Coverage Extended (3 datasets)
+  flu_vaccination_coverage: 'vh55-3he6', // Influenza Vaccination Coverage (All Ages 6+ Months)
+  pregnant_vaccinations: 'h7pm-wmjc', // Vaccination Coverage among Pregnant Women
+  kindergarten_vaccinations: 'ijqb-a7ye', // Kindergarten Vaccination Coverage and Exemptions
+
+  // Vital Statistics Extended (1 dataset)
+  birth_rates_age: 'yt7u-eiyg', // Birth Rates by Age Group
+
+  // Injury Surveillance (1 dataset)
+  tbi_surveillance: 'b4av-siev', // TBI Emergency Department Visits, Hospitalizations, Deaths
+
+  // Tobacco Policy & Coverage (2 datasets)
+  smokefree_air_legislation: '32fd-hyzc', // CDC STATE System - Smokefree Indoor Air Legislation
+  medicaid_cessation_coverage: 'ntaa-dtex', // Medicaid Coverage of Cessation Treatments
+
+  // BRFSS Extended (1 dataset)
+  brfss_smart_county: 'cpem-dkkm', // BRFSS SMART County Prevalence (Metropolitan Area Risk Trends)
+
+  // Youth Health Extended (1 dataset)
+  youth_nutrition_activity: 'vba9-s8jp', // Nutrition, Physical Activity, Obesity - Youth Risk Behavior
+
+  // Infectious Disease Surveillance (2 datasets)
+  pneumococcal_disease: 'qvzb-qs6p', // Invasive Pneumococcal Disease 1998-2023 (Serotype Data)
+  foodborne_outbreaks: '5xkq-dg7x', // NORS - Foodborne/Waterborne Disease Outbreaks
 } as const;
 
 export type DatasetName = keyof typeof DATASETS;
@@ -123,6 +154,20 @@ export const DATASET_DESCRIPTIONS: Record<DatasetName, string> = {
   sammec_smoking_impact: 'SAMMEC: Smoking-attributable mortality, morbidity, and economic costs',
   oral_health_indicators: 'NOHSS: Adult oral health indicators (dental visits, tooth loss, cancer screening)',
   vision_health: 'BRFSS: Vision and eye health surveillance (blindness, exams, diabetic retinopathy)',
+
+  // Tier 2 Expansion Descriptions
+  rsv_hospitalizations: 'RSV-NET: RSV-specific hospitalization surveillance by age group',
+  flu_vaccination_coverage: 'Influenza Vaccination Coverage: All ages 6+ months by race, state',
+  pregnant_vaccinations: 'Vaccination Coverage: Pregnant women (flu, Tdap during pregnancy)',
+  kindergarten_vaccinations: 'Kindergarten Vaccination Coverage: School entry rates and exemption trends',
+  birth_rates_age: 'NCHS: Age-specific fertility rates over time',
+  tbi_surveillance: 'TBI Surveillance: Emergency visits, hospitalizations, deaths by mechanism',
+  smokefree_air_legislation: 'STATE System: Smokefree indoor air laws by venue type',
+  medicaid_cessation_coverage: 'Medicaid Coverage: Smoking cessation treatment policies by state',
+  brfss_smart_county: 'BRFSS SMART: Metropolitan Area Risk Trends - county-level prevalence',
+  youth_nutrition_activity: 'NPAO: Youth-specific nutrition and physical activity data',
+  pneumococcal_disease: 'Invasive Pneumococcal Disease: 25-year serotype surveillance (1998-2023)',
+  foodborne_outbreaks: 'NORS: Foodborne/waterborne disease outbreak surveillance',
 };
 
 /**

@@ -589,4 +589,164 @@ export class CDCClient {
       data,
     };
   }
+
+  // === TIER 2 EXPANSION METHODS ===
+
+  /**
+   * Get injury surveillance data (TBI, motor vehicle)
+   */
+  async getInjurySurveillance(
+    injury_type: string = 'tbi',
+    state?: string,
+    mechanism?: string,
+    year?: number,
+    limit: number = 100,
+    offset: number = 0
+  ): Promise<CDCResponse> {
+    const datasetId = DATASETS.tbi_surveillance;
+
+    const params: Record<string, any> = {
+      $limit: Math.min(limit, 50000),
+      $offset: offset,
+      $order: 'year DESC',
+    };
+
+    const whereClauses: string[] = [];
+    if (state) whereClauses.push(`state='${state}'`);
+    if (year) whereClauses.push(`year=${year}`);
+    if (mechanism && mechanism !== 'all') {
+      const mechanismMap: Record<string, string> = {
+        fall: "injurymechanism LIKE '%Fall%' OR injurymechanism LIKE '%Unintentional Fall%'",
+        motor_vehicle: "injurymechanism LIKE '%Motor Vehicle%' OR injurymechanism LIKE '%MVT%'",
+        assault: "injurymechanism LIKE '%Assault%' OR injurymechanism LIKE '%Violence%'",
+        sports: "injurymechanism LIKE '%Sports%' OR injurymechanism LIKE '%Recreation%'",
+      };
+      if (mechanismMap[mechanism]) {
+        whereClauses.push(`(${mechanismMap[mechanism]})`);
+      }
+    }
+
+    if (whereClauses.length > 0) {
+      params.$where = whereClauses.join(' AND ');
+    }
+
+    const data = await this.makeRequest(datasetId, params);
+
+    return {
+      dataset: 'tbi_surveillance',
+      count: data.length,
+      data,
+    };
+  }
+
+  /**
+   * Get tobacco policy data (legislation, Medicaid coverage)
+   */
+  async getTobaccoPolicy(
+    policy_type: string,
+    state?: string,
+    venue?: string,
+    year?: number,
+    limit: number = 100,
+    offset: number = 0
+  ): Promise<CDCResponse> {
+    // Select dataset based on policy type
+    const datasetMap: Record<string, string> = {
+      smokefree_air: DATASETS.smokefree_air_legislation,
+      medicaid_cessation: DATASETS.medicaid_cessation_coverage,
+    };
+
+    const datasetId = datasetMap[policy_type] || DATASETS.smokefree_air_legislation;
+
+    const params: Record<string, any> = {
+      $limit: Math.min(limit, 50000),
+      $offset: offset,
+    };
+
+    const whereClauses: string[] = [];
+    if (state) whereClauses.push(`locationabbr='${state.toUpperCase()}'`);
+    if (year) whereClauses.push(`year=${year}`);
+    if (venue && venue !== 'all' && policy_type === 'smokefree_air') {
+      const venueMap: Record<string, string> = {
+        workplace: "locationtype='Private Worksites'",
+        restaurant: "locationtype='Restaurants'",
+        bar: "locationtype='Bars'",
+        government: "locationtype='Government Worksites'",
+        school: "locationtype='Schools'",
+      };
+      if (venueMap[venue]) {
+        whereClauses.push(venueMap[venue]);
+      }
+    }
+
+    if (whereClauses.length > 0) {
+      params.$where = whereClauses.join(' AND ');
+    }
+
+    const data = await this.makeRequest(datasetId, params, CHRONICDATA_BASE_URL);
+
+    return {
+      dataset: `tobacco_policy_${policy_type}`,
+      count: data.length,
+      data,
+    };
+  }
+
+  /**
+   * Get infectious disease surveillance data (pneumococcal, foodborne/waterborne)
+   */
+  async getInfectiousDisease(
+    disease: string,
+    state?: string,
+    serotype?: string,
+    pathogen?: string,
+    year?: number,
+    limit: number = 100,
+    offset: number = 0
+  ): Promise<CDCResponse> {
+    // Select dataset based on disease type
+    const datasetMap: Record<string, string> = {
+      pneumococcal: DATASETS.pneumococcal_disease,
+      foodborne: DATASETS.foodborne_outbreaks,
+      waterborne: DATASETS.foodborne_outbreaks, // NORS covers both
+    };
+
+    const datasetId = datasetMap[disease] || DATASETS.pneumococcal_disease;
+
+    const params: Record<string, any> = {
+      $limit: Math.min(limit, 50000),
+      $offset: offset,
+      $order: 'year DESC',
+    };
+
+    const whereClauses: string[] = [];
+    if (state) whereClauses.push(`state='${state}'`);
+    if (year) whereClauses.push(`year=${year}`);
+
+    // Pneumococcal-specific filtering
+    if (disease === 'pneumococcal' && serotype) {
+      whereClauses.push(`serotype='${serotype}'`);
+    }
+
+    // Foodborne/waterborne-specific filtering
+    if ((disease === 'foodborne' || disease === 'waterborne') && pathogen) {
+      whereClauses.push(`(etiology LIKE '%${pathogen}%' OR confirmedagent LIKE '%${pathogen}%')`);
+    }
+
+    if (disease === 'waterborne') {
+      whereClauses.push("(mode LIKE '%Water%' OR waterexposure='Yes')");
+    }
+
+    if (whereClauses.length > 0) {
+      params.$where = whereClauses.join(' AND ');
+    }
+
+    const data = await this.makeRequest(datasetId, params);
+
+    return {
+      dataset: `infectious_disease_${disease}`,
+      count: data.length,
+      data,
+    };
+  }
 }
