@@ -1,0 +1,34 @@
+{
+  "name": "cdc-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for CDC public health data via Socrata Open Data API (SODA)",
+  "main": "build/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc && node build/index.js",
+    "dev": "tsc --watch",
+    "prepare": "tsc"
+  },
+  "keywords": [
+    "mcp",
+    "cdc",
+    "health",
+    "disease",
+    "prevalence",
+    "surveillance"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "axios": "^1.7.9",
+    "axios-retry": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
