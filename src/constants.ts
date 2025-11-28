@@ -1,8 +1,8 @@
 /**
  * CDC Dataset Identifiers for Socrata Open Data API (SODA)
  *
- * Total: 45 public datasets (no authentication required) - TIER 1 + TIER 2 EXPANSION
- * Coverage: 70+ health measures across multiple surveillance systems
+ * Total: 53 public datasets (no authentication required) - TIER 1 + TIER 2 + TIER 3 EXPANSION
+ * Coverage: 80+ health measures across multiple surveillance systems
  * Last Updated: 2025-11-28
  */
 
@@ -111,6 +111,25 @@ export const DATASETS = {
   // Infectious Disease Surveillance (2 datasets)
   pneumococcal_disease: 'qvzb-qs6p', // Invasive Pneumococcal Disease 1998-2023 (Serotype Data)
   foodborne_outbreaks: '5xkq-dg7x', // NORS - Foodborne/Waterborne Disease Outbreaks
+
+  // === TIER 3 EXPANSION: COMPLETENESS DATASETS (8 datasets) ===
+  // Added 2025-11-28 - Additional coverage, historical data, niche use cases
+
+  // Maternal & Child Health (2 datasets)
+  breastfeeding_nis: '8hxn-cvik', // National Immunization Survey - Breastfeeding Rates
+  pramstat_2009: 'qwpv-wpc8', // PRAMStat - Pregnancy Risk Assessment Monitoring System 2009
+
+  // Tobacco Policy Extended (3 datasets)
+  tobacco_licensure: 'eb4y-d4ic', // CDC STATE System - Tobacco Retailer Licensure Legislation
+  tobacco_tax: '2dwv-vfam', // CDC STATE System - Tobacco Tax Legislation
+  ecigarette_legislation: 'wan8-w4er', // CDC STATE System - E-Cigarette Legislation
+
+  // Environmental & Injury Prevention (2 datasets)
+  water_fluoridation: '8235-5d73', // Water Fluoridation Statistics
+  alcohol_impaired_driving: 'haed-k2ka', // Alcohol-Impaired Driving Deaths
+
+  // Historical BRFSS (1 dataset)
+  brfss_healthcare_access_historical: 't984-9cdv', // BRFSS Health Care Access/Coverage 1995-2010
 } as const;
 
 export type DatasetName = keyof typeof DATASETS;
@@ -168,6 +187,16 @@ export const DATASET_DESCRIPTIONS: Record<DatasetName, string> = {
   youth_nutrition_activity: 'NPAO: Youth-specific nutrition and physical activity data',
   pneumococcal_disease: 'Invasive Pneumococcal Disease: 25-year serotype surveillance (1998-2023)',
   foodborne_outbreaks: 'NORS: Foodborne/waterborne disease outbreak surveillance',
+
+  // Tier 3 Expansion Descriptions
+  breastfeeding_nis: 'NIS: Breastfeeding rates - initiation, duration, exclusivity by state',
+  pramstat_2009: 'PRAMStat: Pregnancy Risk Assessment Monitoring System 2009 data',
+  tobacco_licensure: 'STATE System: Tobacco retailer licensure laws by state',
+  tobacco_tax: 'STATE System: Cigarette and tobacco tax legislation',
+  ecigarette_legislation: 'STATE System: E-cigarette regulation and taxation policies',
+  water_fluoridation: 'Water Systems: Community water fluoridation statistics',
+  alcohol_impaired_driving: 'FARS: Alcohol-impaired driving deaths by state',
+  brfss_healthcare_access_historical: 'BRFSS: Historical health care access/coverage trends 1995-2010',
 };
 
 /**

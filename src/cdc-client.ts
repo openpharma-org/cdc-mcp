@@ -654,6 +654,10 @@ export class CDCClient {
     const datasetMap: Record<string, string> = {
       smokefree_air: DATASETS.smokefree_air_legislation,
       medicaid_cessation: DATASETS.medicaid_cessation_coverage,
+      // Tier 3 Expansion
+      licensure: DATASETS.tobacco_licensure,
+      tax: DATASETS.tobacco_tax,
+      ecigarette: DATASETS.ecigarette_legislation,
     };
 
     const datasetId = datasetMap[policy_type] || DATASETS.smokefree_air_legislation;

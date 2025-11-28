@@ -29,7 +29,7 @@ const cdcClient = new CDCClient(appToken);
 const server = new Server(
   {
     name: 'cdc-mcp-server',
-    version: '1.2.0', // Tier 1 & 2 Expansion - 45 datasets
+    version: '1.3.0', // Tier 1 + 2 + 3 Expansion - 53 datasets
   },
   {
     capabilities: {
@@ -43,7 +43,7 @@ const CDC_TOOL: Tool = {
   name: 'cdc_health_data',
   description: `Unified tool for CDC public health data operations: access disease prevalence, chronic disease indicators, behavioral risk factors, and health surveillance data from CDC's Socrata Open Data API (SODA).
 
-Available data sources (45 datasets - Tier 1 & 2 Expansion):
+Available data sources (53 datasets - Tier 1 + 2 + 3 Complete Expansion):
 - PLACES: Local disease prevalence data at county, place, census tract, and ZIP code levels
 - BRFSS: Behavioral Risk Factor Surveillance System for chronic disease risk factors (comprehensive 2011-present)
 - YRBSS: Youth Risk Behavior Surveillance (substance use, mental health, violence, sexual behaviors)
