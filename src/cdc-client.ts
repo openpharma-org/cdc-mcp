@@ -265,4 +265,328 @@ export class CDCClient {
       data: [],
     };
   }
+
+  // === TIER 1 EXPANSION METHODS ===
+
+  /**
+   * Get YRBSS (Youth Risk Behavior Surveillance System) data
+   */
+  async getYRBSSData(
+    state?: string,
+    topic?: string,
+    year?: number,
+    limit: number = 100,
+    offset: number = 0
+  ): Promise<CDCResponse> {
+    const datasetId = DATASETS.yrbss_high_school;
+
+    const params: Record<string, any> = {
+      $limit: Math.min(limit, 50000),
+      $offset: offset,
+    };
+
+    const whereClauses: string[] = [];
+    if (state) whereClauses.push(`locationabbr='${state.toUpperCase()}'`);
+    if (year) whereClauses.push(`year=${year}`);
+    if (topic) {
+      // Topic mapping to YRBSS question categories
+      const topicMap: Record<string, string> = {
+        substance_use: "topic LIKE '%Tobacco%' OR topic LIKE '%Alcohol%' OR topic LIKE '%Marijuana%'",
+        mental_health: "topic LIKE '%Mental Health%' OR topic LIKE '%Suicide%'",
+        violence: "topic LIKE '%Violence%' OR topic LIKE '%Bullying%'",
+        sexual_behaviors: "topic LIKE '%Sexual%'",
+        nutrition: "topic LIKE '%Dietary%' OR topic LIKE '%Fruit%' OR topic LIKE '%Vegetable%'",
+        physical_activity: "topic LIKE '%Physical Activity%' OR topic LIKE '%Sports%'",
+      };
+      if (topicMap[topic]) {
+        whereClauses.push(`(${topicMap[topic]})`);
+      }
+    }
+
+    if (whereClauses.length > 0) {
+      params.$where = whereClauses.join(' AND ');
+    }
+
+    const data = await this.makeRequest(datasetId, params);
+
+    return {
+      dataset: 'yrbss_high_school',
+      count: data.length,
+      data,
+    };
+  }
+
+  /**
+   * Get respiratory surveillance data (RSV/COVID-19/Flu combined)
+   */
+  async getRespiratorySurveillance(
+    virus?: string,
+    state?: string,
+    year?: number,
+    limit: number = 100,
+    offset: number = 0
+  ): Promise<CDCResponse> {
+    const datasetId = DATASETS.respiratory_combined;
+
+    const params: Record<string, any> = {
+      $limit: Math.min(limit, 50000),
+      $offset: offset,
+      $order: 'weekendingdate DESC',
+    };
+
+    const whereClauses: string[] = [];
+    if (state) whereClauses.push(`jurisdiction='${state}'`);
+    if (year) whereClauses.push(`year=${year}`);
+    if (virus && virus !== 'combined') {
+      const virusMap: Record<string, string> = {
+        rsv: "indicator LIKE '%RSV%'",
+        covid: "indicator LIKE '%COVID%'",
+        flu: "indicator LIKE '%Influenza%' OR indicator LIKE '%Flu%'",
+      };
+      if (virusMap[virus]) {
+        whereClauses.push(`(${virusMap[virus]})`);
+      }
+    }
+
+    if (whereClauses.length > 0) {
+      params.$where = whereClauses.join(' AND ');
+    }
+
+    const data = await this.makeRequest(datasetId, params);
+
+    return {
+      dataset: 'respiratory_combined',
+      count: data.length,
+      data,
+    };
+  }
+
+  /**
+   * Get vaccination coverage data (teen/pregnant/kindergarten)
+   */
+  async getVaccinationCoverage(
+    age_group: string,
+    state?: string,
+    vaccine_type?: string,
+    year?: number,
+    limit: number = 100,
+    offset: number = 0
+  ): Promise<CDCResponse> {
+    // Select appropriate dataset based on age group
+    const datasetMap: Record<string, DatasetName> = {
+      teen: 'teen_vaccinations',
+      pregnant: 'h7pm-wmjc' as any, // Not in DATASETS yet
+      kindergarten: 'ijqb-a7ye' as any, // Not in DATASETS yet
+    };
+
+    const datasetKey = datasetMap[age_group] || 'teen_vaccinations';
+    const datasetId = DATASETS[datasetKey as DatasetName];
+
+    const params: Record<string, any> = {
+      $limit: Math.min(limit, 50000),
+      $offset: offset,
+    };
+
+    const whereClauses: string[] = [];
+    if (state) whereClauses.push(`geography='${state}'`);
+    if (year) whereClauses.push(`year=${year}`);
+    if (vaccine_type) {
+      const vaccineMap: Record<string, string> = {
+        hpv: "vaccine LIKE '%HPV%'",
+        tdap: "vaccine LIKE '%Tdap%' OR vaccine LIKE '%DTaP%'",
+        menacwy: "vaccine LIKE '%MenACWY%' OR vaccine LIKE '%Meningococcal%'",
+        flu: "vaccine LIKE '%Influenza%' OR vaccine LIKE '%Flu%'",
+      };
+      if (vaccineMap[vaccine_type]) {
+        whereClauses.push(`(${vaccineMap[vaccine_type]})`);
+      }
+    }
+
+    if (whereClauses.length > 0) {
+      params.$where = whereClauses.join(' AND ');
+    }
+
+    const data = await this.makeRequest(datasetId, params);
+
+    return {
+      dataset: `vaccination_coverage_${age_group}`,
+      count: data.length,
+      data,
+    };
+  }
+
+  /**
+   * Get birth statistics data
+   */
+  async getBirthStatistics(
+    indicator?: string,
+    state?: string,
+    year?: number,
+    limit: number = 100,
+    offset: number = 0
+  ): Promise<CDCResponse> {
+    // Use quarterly birth indicators by default
+    const datasetId = indicator === 'birth_rate'
+      ? DATASETS.death_rates_major_causes // Placeholder - contains vital stats
+      : DATASETS.vsrr_birth_quarterly;
+
+    const params: Record<string, any> = {
+      $limit: Math.min(limit, 50000),
+      $offset: offset,
+      $order: 'year DESC',
+    };
+
+    const whereClauses: string[] = [];
+    if (state) whereClauses.push(`jurisdiction='${state}'`);
+    if (year) whereClauses.push(`year=${year}`);
+    if (indicator && indicator !== 'birth_rate') {
+      const indicatorMap: Record<string, string> = {
+        preterm: "indicator LIKE '%Preterm%'",
+        cesarean: "indicator LIKE '%Cesarean%' OR indicator LIKE '%C-section%'",
+        low_birth_weight: "indicator LIKE '%Low birth weight%'",
+      };
+      if (indicatorMap[indicator]) {
+        whereClauses.push(`(${indicatorMap[indicator]})`);
+      }
+    }
+
+    if (whereClauses.length > 0) {
+      params.$where = whereClauses.join(' AND ');
+    }
+
+    const data = await this.makeRequest(datasetId, params);
+
+    return {
+      dataset: 'birth_statistics',
+      count: data.length,
+      data,
+    };
+  }
+
+  /**
+   * Get environmental health data (air quality)
+   */
+  async getEnvironmentalHealth(
+    pollutant?: string,
+    state?: string,
+    county?: string,
+    year?: number,
+    limit: number = 100,
+    offset: number = 0
+  ): Promise<CDCResponse> {
+    const datasetId = DATASETS.air_quality_tracking;
+
+    const params: Record<string, any> = {
+      $limit: Math.min(limit, 50000),
+      $offset: offset,
+      $order: 'year DESC',
+    };
+
+    const whereClauses: string[] = [];
+    if (state) whereClauses.push(`statefips='${state}' OR statename='${state}'`);
+    if (county) whereClauses.push(`countyname LIKE '%${county}%'`);
+    if (year) whereClauses.push(`year=${year}`);
+    if (pollutant && pollutant !== 'combined') {
+      const pollutantMap: Record<string, string> = {
+        pm25: "measurename LIKE '%PM2.5%' OR measurename LIKE '%Particulate%'",
+        ozone: "measurename LIKE '%Ozone%' OR measurename LIKE '%O3%'",
+      };
+      if (pollutantMap[pollutant]) {
+        whereClauses.push(`(${pollutantMap[pollutant]})`);
+      }
+    }
+
+    if (whereClauses.length > 0) {
+      params.$where = whereClauses.join(' AND ');
+    }
+
+    const data = await this.makeRequest(datasetId, params);
+
+    return {
+      dataset: 'air_quality_tracking',
+      count: data.length,
+      data,
+    };
+  }
+
+  /**
+   * Get tobacco impact data (SAMMEC - Smoking-Attributable Mortality, Morbidity, Economic Costs)
+   */
+  async getTobaccoImpact(
+    impact_type?: string,
+    state?: string,
+    year?: number,
+    limit: number = 100,
+    offset: number = 0
+  ): Promise<CDCResponse> {
+    const datasetId = DATASETS.sammec_smoking_impact;
+
+    const params: Record<string, any> = {
+      $limit: Math.min(limit, 50000),
+      $offset: offset,
+    };
+
+    const whereClauses: string[] = [];
+    if (state) whereClauses.push(`locationabbr='${state.toUpperCase()}'`);
+    if (year) whereClauses.push(`year=${year}`);
+    if (impact_type) {
+      const impactMap: Record<string, string> = {
+        mortality: "measureid LIKE '%MORT%' OR measureid LIKE '%DEATH%'",
+        morbidity: "measureid LIKE '%MORB%' OR measureid LIKE '%ILL%'",
+        economic_cost: "measureid LIKE '%COST%' OR measureid LIKE '%ECONOMIC%'",
+      };
+      if (impactMap[impact_type]) {
+        whereClauses.push(`(${impactMap[impact_type]})`);
+      }
+    }
+
+    if (whereClauses.length > 0) {
+      params.$where = whereClauses.join(' AND ');
+    }
+
+    const data = await this.makeRequest(datasetId, params, CHRONICDATA_BASE_URL);
+
+    return {
+      dataset: 'sammec_smoking_impact',
+      count: data.length,
+      data,
+    };
+  }
+
+  /**
+   * Get oral and vision health data
+   */
+  async getOralVisionHealth(
+    health_domain: string,
+    state?: string,
+    year?: number,
+    limit: number = 100,
+    offset: number = 0
+  ): Promise<CDCResponse> {
+    // Select appropriate dataset based on health domain
+    const datasetId = health_domain === 'oral'
+      ? DATASETS.oral_health_indicators
+      : DATASETS.vision_health;
+
+    const params: Record<string, any> = {
+      $limit: Math.min(limit, 50000),
+      $offset: offset,
+    };
+
+    const whereClauses: string[] = [];
+    if (state) whereClauses.push(`locationabbr='${state.toUpperCase()}'`);
+    if (year) whereClauses.push(`year=${year}`);
+
+    if (whereClauses.length > 0) {
+      params.$where = whereClauses.join(' AND ');
+    }
+
+    const data = await this.makeRequest(datasetId, params, CHRONICDATA_BASE_URL);
+
+    return {
+      dataset: health_domain === 'oral' ? 'oral_health_indicators' : 'vision_health',
+      count: data.length,
+      data,
+    };
+  }
 }

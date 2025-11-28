@@ -29,7 +29,7 @@ const cdcClient = new CDCClient(appToken);
 const server = new Server(
   {
     name: 'cdc-mcp-server',
-    version: '1.0.0',
+    version: '1.1.0', // Tier 1 Expansion - 33 datasets
   },
   {
     capabilities: {
@@ -43,9 +43,16 @@ const CDC_TOOL: Tool = {
   name: 'cdc_health_data',
   description: `Unified tool for CDC public health data operations: access disease prevalence, chronic disease indicators, behavioral risk factors, and health surveillance data from CDC's Socrata Open Data API (SODA).
 
-Available data sources:
+Available data sources (33 datasets - Tier 1 Expansion):
 - PLACES: Local disease prevalence data at county, place, census tract, and ZIP code levels
-- BRFSS: Behavioral Risk Factor Surveillance System for chronic disease risk factors
+- BRFSS: Behavioral Risk Factor Surveillance System for chronic disease risk factors (comprehensive 2011-present)
+- YRBSS: Youth Risk Behavior Surveillance (substance use, mental health, violence, sexual behaviors)
+- Respiratory Surveillance: Combined RSV/COVID-19/Flu hospitalization tracking
+- Vaccination Coverage: Teen (HPV, Tdap, MenACWY), pregnant women, kindergarten immunizations
+- Birth Statistics: VSRR quarterly birth indicators (rates, preterm, cesarean delivery)
+- Environmental Health: Air quality tracking (PM2.5, ozone) with health impacts
+- Tobacco Impact: SAMMEC smoking-attributable mortality, morbidity, economic costs
+- Oral & Vision Health: NOHSS oral health indicators, BRFSS vision health surveillance
 - VSRR: Vital Statistics Rapid Release for provisional mortality data
 - Nutrition/Physical Activity/Obesity: Behavioral and environmental data
 - Disease-specific datasets: Diabetes, obesity, heart disease, cancer, etc.
@@ -62,13 +69,30 @@ Use the method parameter to specify the operation type.`,
           'search_dataset',
           'get_available_measures',
           'list_datasets',
+          // Tier 1 Expansion Methods
+          'get_yrbss_data',
+          'get_respiratory_surveillance',
+          'get_vaccination_coverage',
+          'get_birth_statistics',
+          'get_environmental_health',
+          'get_tobacco_impact',
+          'get_oral_vision_health',
         ],
         description: `The operation to perform:
 - get_places_data: Get PLACES local disease prevalence data
 - get_brfss_data: Get BRFSS behavioral risk factor data
 - search_dataset: Generic search across any CDC dataset
 - get_available_measures: List available measures for a dataset
-- list_datasets: List all available CDC datasets`,
+- list_datasets: List all available CDC datasets
+
+TIER 1 EXPANSION METHODS:
+- get_yrbss_data: Youth Risk Behavior Surveillance (substance use, mental health, violence)
+- get_respiratory_surveillance: Combined RSV/COVID-19/Flu hospitalization surveillance
+- get_vaccination_coverage: Teen/pregnant/kindergarten vaccination rates
+- get_birth_statistics: Birth rates, preterm births, cesarean delivery data
+- get_environmental_health: Air quality tracking (PM2.5, ozone) with health impacts
+- get_tobacco_impact: Smoking-attributable mortality, morbidity, economic costs
+- get_oral_vision_health: Oral and vision health indicators`,
       },
 
       // PLACES parameters
@@ -136,6 +160,66 @@ Use the method parameter to specify the operation type.`,
         description: 'Starting record number for pagination (default: 0)',
         default: 0,
         minimum: 0,
+      },
+
+      // === TIER 1 EXPANSION PARAMETERS ===
+
+      // YRBSS parameters
+      topic: {
+        type: 'string',
+        enum: ['substance_use', 'mental_health', 'violence', 'sexual_behaviors', 'nutrition', 'physical_activity'],
+        description: 'For get_yrbss_data: Topic category filter',
+      },
+
+      // Respiratory surveillance parameters
+      virus: {
+        type: 'string',
+        enum: ['rsv', 'covid', 'flu', 'combined'],
+        description: 'For get_respiratory_surveillance: Virus type to filter (default: combined)',
+      },
+
+      // Vaccination parameters
+      age_group: {
+        type: 'string',
+        enum: ['teen', 'pregnant', 'kindergarten'],
+        description: 'For get_vaccination_coverage: Age group category',
+      },
+      vaccine_type: {
+        type: 'string',
+        enum: ['hpv', 'tdap', 'menacwy', 'flu'],
+        description: 'For get_vaccination_coverage: Specific vaccine type',
+      },
+
+      // Birth statistics parameters
+      indicator: {
+        type: 'string',
+        enum: ['birth_rate', 'preterm', 'cesarean', 'low_birth_weight'],
+        description: 'For get_birth_statistics: Birth indicator type',
+      },
+
+      // Environmental health parameters
+      pollutant: {
+        type: 'string',
+        enum: ['pm25', 'ozone', 'combined'],
+        description: 'For get_environmental_health: Air pollutant type (default: combined)',
+      },
+      county: {
+        type: 'string',
+        description: 'For get_environmental_health: County name filter',
+      },
+
+      // Tobacco impact parameters
+      impact_type: {
+        type: 'string',
+        enum: ['mortality', 'morbidity', 'economic_cost'],
+        description: 'For get_tobacco_impact: Type of smoking impact data',
+      },
+
+      // Oral/Vision health parameters
+      health_domain: {
+        type: 'string',
+        enum: ['oral', 'vision'],
+        description: 'For get_oral_vision_health: Health domain (oral or vision)',
       },
     },
     required: ['method'],
@@ -211,6 +295,86 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           throw new Error('dataset_name is required for get_available_measures');
         }
         result = await cdcClient.getAvailableMeasures(params.dataset_name);
+        break;
+
+      // === TIER 1 EXPANSION METHODS ===
+
+      case 'get_yrbss_data':
+        result = await cdcClient.getYRBSSData(
+          params.state,
+          params.topic,
+          params.year ? parseInt(params.year) : undefined,
+          params.limit || 100,
+          params.offset || 0
+        );
+        break;
+
+      case 'get_respiratory_surveillance':
+        result = await cdcClient.getRespiratorySurveillance(
+          params.virus,
+          params.state,
+          params.year ? parseInt(params.year) : undefined,
+          params.limit || 100,
+          params.offset || 0
+        );
+        break;
+
+      case 'get_vaccination_coverage':
+        if (!params.age_group) {
+          throw new Error('age_group is required for get_vaccination_coverage');
+        }
+        result = await cdcClient.getVaccinationCoverage(
+          params.age_group,
+          params.state,
+          params.vaccine_type,
+          params.year ? parseInt(params.year) : undefined,
+          params.limit || 100,
+          params.offset || 0
+        );
+        break;
+
+      case 'get_birth_statistics':
+        result = await cdcClient.getBirthStatistics(
+          params.indicator,
+          params.state,
+          params.year ? parseInt(params.year) : undefined,
+          params.limit || 100,
+          params.offset || 0
+        );
+        break;
+
+      case 'get_environmental_health':
+        result = await cdcClient.getEnvironmentalHealth(
+          params.pollutant,
+          params.state,
+          params.county,
+          params.year ? parseInt(params.year) : undefined,
+          params.limit || 100,
+          params.offset || 0
+        );
+        break;
+
+      case 'get_tobacco_impact':
+        result = await cdcClient.getTobaccoImpact(
+          params.impact_type,
+          params.state,
+          params.year ? parseInt(params.year) : undefined,
+          params.limit || 100,
+          params.offset || 0
+        );
+        break;
+
+      case 'get_oral_vision_health':
+        if (!params.health_domain) {
+          throw new Error('health_domain is required for get_oral_vision_health');
+        }
+        result = await cdcClient.getOralVisionHealth(
+          params.health_domain,
+          params.state,
+          params.year ? parseInt(params.year) : undefined,
+          params.limit || 100,
+          params.offset || 0
+        );
         break;
 
       default:
