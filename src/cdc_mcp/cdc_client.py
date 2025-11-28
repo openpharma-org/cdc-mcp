@@ -8,6 +8,7 @@ import time
 from typing import Dict, List, Optional, Any, Union
 from urllib.parse import urlencode, quote
 import logging
+import base64
 
 logger = logging.getLogger(__name__)
 
@@ -37,13 +38,13 @@ class CDCAPIClient:
         "brfss_asthma": "kj5r-3dtm",
         "brfss_asthma_prevalence": "xb47-c5mz",  # Current asthma prevalence graph (2011+)
         "brfss_tobacco_use": "8zak-ewtm",  # Tobacco use prevalence trends (1995-2010)
-        # Note: Some BRFSS datasets require authentication
-        # "brfss_chronic_health_indicators": "u7k3-tu8b",  # Requires auth
-        # "brfss_demographics": "6rsf-i7tq",  # Requires auth
-        # "brfss_cvd_surveillance": "ikwk-8git",  # Requires auth
 
-        # Chronic Disease Indicators (Note: May require authentication)
-        # "chronic_disease_indicators": "g4ie-h725",
+        # Note: The following datasets require special CDC permissions and are not publicly accessible
+        # even with standard Socrata app tokens. Access requires approval from CDC data.gov team.
+        # "brfss_chronic_health_indicators": "u7k3-tu8b",  # Chronic health indicators (requires special access)
+        # "brfss_demographics": "6rsf-i7tq",  # Demographics breakdowns (requires special access)
+        # "brfss_cvd_surveillance": "ikwk-8git",  # CVD surveillance data (requires special access)
+        # "chronic_disease_indicators": "g4ie-h725",  # U.S. Chronic Disease Indicators (requires special access)
 
         # Nutrition, Physical Activity, Obesity
         "nutrition_obesity": "hn4x-zwk7",
@@ -75,20 +76,35 @@ class CDCAPIClient:
         "adult_tobacco_consumption": "rnvb-cpxx",  # Adult tobacco consumption (2000+)
     }
 
-    def __init__(self, app_token: Optional[str] = None):
+    def __init__(self, app_token: Optional[str] = None, app_token_secret: Optional[str] = None):
         """
         Initialize CDC API client.
 
         Args:
-            app_token: Optional Socrata app token for higher rate limits
-                      (1000 requests/hour vs shared pool)
+            app_token: Optional Socrata app token (keyId) for authentication
+            app_token_secret: Optional Socrata app token secret (keySecret)
+                            If both provided, uses Basic Authentication
+                            If only app_token provided, uses X-App-Token header
         """
         self.app_token = app_token
+        self.app_token_secret = app_token_secret
         self.last_request_time = 0
         self.session = requests.Session()
 
-        if app_token:
+        # Set up authentication
+        if app_token and app_token_secret:
+            # Use Basic Authentication for accessing restricted datasets
+            credentials = f"{app_token}:{app_token_secret}"
+            encoded = base64.b64encode(credentials.encode()).decode()
+            self.session.headers.update({
+                "Authorization": f"Basic {encoded}",
+                "X-App-Token": app_token  # Include both for maximum compatibility
+            })
+            logger.info("Using Basic Authentication with app token credentials")
+        elif app_token:
+            # Use X-App-Token header only for higher rate limits
             self.session.headers.update({"X-App-Token": app_token})
+            logger.info("Using X-App-Token header for enhanced rate limits")
 
     def _rate_limit(self):
         """Implement rate limiting between requests."""

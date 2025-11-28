@@ -16,14 +16,18 @@ from .cdc_client import CDCAPIClient
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Initialize CDC client
+# Initialize CDC client with authentication
 app_token = os.getenv("CDC_APP_TOKEN")
-if app_token:
+app_token_secret = os.getenv("CDC_APP_TOKEN_SECRET")
+
+if app_token and app_token_secret:
+    logger.info("Using CDC app token with Basic Authentication (unlocks restricted datasets)")
+elif app_token:
     logger.info("Using CDC app token for enhanced rate limits")
 else:
     logger.info("No CDC app token found - using shared rate limit pool")
 
-cdc_client = CDCAPIClient(app_token=app_token)
+cdc_client = CDCAPIClient(app_token=app_token, app_token_secret=app_token_secret)
 
 # Tool definition with unified interface
 TOOL_DEFINITIONS = [
