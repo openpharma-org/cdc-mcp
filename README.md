@@ -1,6 +1,6 @@
-# CDC MCP Server
+# Unofficial CDC MCP Server
 
-A comprehensive Node.js MCP (Model Context Protocol) server providing access to CDC (Centers for Disease Control and Prevention) public health data through the Socrata Open Data API (SODA).
+A comprehensive MCP (Model Context Protocol) server providing access to CDC (Centers for Disease Control and Prevention) public health data through the Socrata Open Data API (SODA).
 
 **Version**: 1.4.0
 **Total Datasets**: 73 (no authentication required)
@@ -44,15 +44,6 @@ A comprehensive Node.js MCP (Model Context Protocol) server providing access to 
 | **🔥 NNDSS** | **14** | **Real-time outbreak detection (50+ notifiable diseases)** |
 | **🔥 COVID-19 Vaccination** | **4** | **County-level tracking with equity metrics** |
 | **🔥 Drug Overdose** | **6** | **Provisional + finalized overdose data by drug type** |
-
-## Installation
-
-```bash
-git clone https://github.com/openpharma-org/cdc-mcp
-cd cdc-mcp-server
-npm install
-npm run build
-```
 
 ## Configuration
 
@@ -739,57 +730,8 @@ The server handles common errors gracefully:
 - **Network errors**: Automatic retries with exponential backoff
 - **Data not found**: Returns empty result set
 
-## Development
-
-### Building from Source
-
-```bash
-npm install
-npm run build
-```
-
-### Running in Dev Mode
-
-```bash
-npm run dev  # Watch mode
-```
-
 ## Data Sources
 
 All data comes from official CDC sources:
 - https://data.cdc.gov
 - https://chronicdata.cdc.gov
-
-Data is provided by CDC and is in the public domain.
-
-## Version History
-
-- **v1.4.0** (2025-11-28): Phase 4 Complete - Critical surveillance gaps filled - 73 datasets total
-  - ✅ NNDSS: 14 datasets for real-time outbreak detection (50+ notifiable diseases)
-  - ✅ COVID-19 Vaccination: 4 datasets with county-level tracking and equity metrics
-  - ✅ Drug Overdose: 6 datasets with provisional data and drug-specific tracking
-  - 🔥 **Transformation**: From chronic disease monitoring → comprehensive public health surveillance
-- **v1.3.0** (2025-11-28): Tier 3 expansion + critical ZCTA fix - 53 datasets total
-- **v1.2.0** (2025-11-28): Tier 2 expansion - 45 datasets
-- **v1.1.0** (2025-11-28): Tier 1 expansion - 33 datasets
-- **v1.0.0**: Initial release - 23 datasets
-
-## License
-
-MIT License - See LICENSE file for details.
-
-## Contributing
-
-Contributions welcome! Please submit issues and pull requests.
-
-## Support
-
-- **CDC Data Questions**: https://www.cdc.gov/about/data-policy/
-- **MCP Server Issues**: https://github.com/openpharma-org/cdc-mcp/issues
-- **MCP Protocol**: https://modelcontextprotocol.io
-
-## Acknowledgments
-
-- CDC for providing open data through Socrata
-- Anthropic for the Model Context Protocol specification
-- Contributors to the open-source community
