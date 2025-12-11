@@ -48,7 +48,7 @@ A comprehensive Node.js MCP (Model Context Protocol) server providing access to 
 ## Installation
 
 ```bash
-git clone https://github.com/uh-joan/cdc-mcp-server
+git clone https://github.com/openpharma-org/cdc-mcp
 cd cdc-mcp-server
 npm install
 npm run build
@@ -785,7 +785,7 @@ Contributions welcome! Please submit issues and pull requests.
 ## Support
 
 - **CDC Data Questions**: https://www.cdc.gov/about/data-policy/
-- **MCP Server Issues**: https://github.com/uh-joan/cdc-mcp-server/issues
+- **MCP Server Issues**: https://github.com/openpharma-org/cdc-mcp/issues
 - **MCP Protocol**: https://modelcontextprotocol.io
 
 ## Acknowledgments
