@@ -2,7 +2,6 @@
 
 A comprehensive MCP (Model Context Protocol) server providing access to CDC (Centers for Disease Control and Prevention) public health data through the Socrata Open Data API (SODA).
 
-**Version**: 1.4.0
 **Total Datasets**: 73 (no authentication required)
 **Surveillance Systems**: 18 different CDC programs
 **Health Measures**: 100+ indicators across chronic disease, behavioral risk, environmental health, outbreak detection, vaccination, and drug overdose
@@ -41,9 +40,9 @@ A comprehensive MCP (Model Context Protocol) server providing access to CDC (Cen
 | **Nutrition** | 3 | Behavioral, policy, youth-specific |
 | **Disease-Specific** | 4 | Heart disease, diabetes, cancer, COVID |
 | **Historical** | 1 | Pre-ACA health care access (1995-2010) |
-| **🔥 NNDSS** | **14** | **Real-time outbreak detection (50+ notifiable diseases)** |
-| **🔥 COVID-19 Vaccination** | **4** | **County-level tracking with equity metrics** |
-| **🔥 Drug Overdose** | **6** | **Provisional + finalized overdose data by drug type** |
+| **NNDSS** | **14** | **Real-time outbreak detection (50+ notifiable diseases)** |
+| **COVID-19 Vaccination** | **4** | **County-level tracking with equity metrics** |
+| **Drug Overdose** | **6** | **Provisional + finalized overdose data by drug type** |
 
 ## Configuration
 
@@ -66,13 +65,6 @@ Add to your MCP client configuration (`.mcp.json` or Claude Code settings):
 ```
 
 **Note**: The `CDC_APP_TOKEN` environment variable is optional but recommended for enhanced rate limits (1,000 req/hour vs shared pool).
-
-### Getting an App Token (Optional)
-
-For enhanced rate limits:
-1. Register at https://data.cdc.gov/profile/app_tokens
-2. Create a new app token
-3. Add to your configuration
 
 ## MCP Methods
 
@@ -721,14 +713,6 @@ measureid IN ('DIABETES', 'OBESITY', 'CHD')
 data_value DESC
 year ASC, data_value DESC
 ```
-
-## Error Handling
-
-The server handles common errors gracefully:
-- **Rate limiting**: Clear message if rate limit exceeded
-- **Invalid parameters**: Parameter validation
-- **Network errors**: Automatic retries with exponential backoff
-- **Data not found**: Returns empty result set
 
 ## Data Sources
 
