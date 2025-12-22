@@ -44,11 +44,7 @@ A comprehensive MCP (Model Context Protocol) server providing access to CDC (Cen
 | **COVID-19 Vaccination** | **4** | **County-level tracking with equity metrics** |
 | **Drug Overdose** | **6** | **Provisional + finalized overdose data by drug type** |
 
-## Configuration
-
-### MCP Client Setup
-
-Add to your MCP client configuration (`.mcp.json` or Claude Code settings):
+## Usage
 
 ```json
 {
